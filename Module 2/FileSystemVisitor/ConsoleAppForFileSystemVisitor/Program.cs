@@ -12,6 +12,7 @@ namespace ConsoleAppForFileSystemVisitor
         static void Main(string[] args)
         {
             string startPosition, searchDir, searchFile;
+
             Console.WriteLine("Введите начальный каталог:");
             startPosition = Console.ReadLine();
             if (!Directory.Exists(startPosition))
@@ -38,8 +39,8 @@ namespace ConsoleAppForFileSystemVisitor
                     ignoreItems = "-";
                 }
                                              
-                FileSystemVisitor.FileSystemVisitor systemVisitor = new FileSystemVisitor.FileSystemVisitor(/*searchDir, searchFile, interruptSearch, ignoreItems*/);
-                //systemVisitor.Notify += DisplayMessage;
+                FileSystemVisitor.FileSystemVisitor systemVisitor = new FileSystemVisitor.FileSystemVisitor();
+                //systemVisitor += DisplayMessage;
                 systemVisitor.Searching(startPosition);                
             }
             Console.ReadLine();

@@ -27,8 +27,8 @@ namespace ConsoleAppForFileSystemVisitor
                 systemVisitor.OnFinish += SystemVisitor_OnFinish;
                 systemVisitor.OnFileFinded += SystemVisitor_OnFileFinded;
                 systemVisitor.OnDirectoryFinded += SystemVisitor_OnDirectoryFinded;
-                systemVisitor.OnFilteredDirectoryFinded += SystemVisitor_OnFilteredDirectoryFinded; ;
-                systemVisitor.OnFilteredFileFinded += SystemVisitor_OnFilteredFileFinded; ;
+                systemVisitor.OnFilteredDirectoryFinded += SystemVisitor_OnFilteredDirectoryFinded;
+                systemVisitor.OnFilteredFileFinded += SystemVisitor_OnFilteredFileFinded;
                 systemVisitor.Searching();
             }
             Console.ReadLine();
@@ -36,7 +36,7 @@ namespace ConsoleAppForFileSystemVisitor
 
         private static void SystemVisitor_OnFilteredFileFinded(string itemName, FileSystemVisitor.FileSystemVisitor.CharachteristicsOfItems arg)
         {
-            arg.cancelSearch = false;
+            arg.cancelSearch = true;
             if (itemName.IndexOf("s")==-1) arg.excludeItem = true;
             else Console.WriteLine($"FilteredFile found: " + itemName);
         }

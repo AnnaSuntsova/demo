@@ -7,19 +7,19 @@ namespace FileSystemVisitor
 {
     public class FileSystemVisitor: IEnumerable<string>
     {
-        private Func<string, bool> search_Pattern;
-        private string startPosition;
+        private Func<string, bool> _searchPattern;
+        private string _startPosition;
 
         public FileSystemVisitor(string startPosition)
         {
-            this.startPosition = startPosition;
-            search_Pattern = null;
+            this._startPosition = startPosition;
+            _searchPattern = null;
         }
 
         public FileSystemVisitor(string startPosition, Func<string, bool> searchPattern)
         {
-            this.startPosition = startPosition;
-            search_Pattern = searchPattern;
+            this._startPosition = startPosition;
+            _searchPattern = searchPattern;
         }
 
         public class CharachteristicsOfItems: EventArgs
@@ -65,35 +65,44 @@ namespace FileSystemVisitor
 
         public IEnumerable<string> Searching()
         {
+            List<string> result = new List<string>();
+
             OnStart?.Invoke(this, null);
 
-            var allFiles = Directory.GetFileSystemEntries(startPosition, "*.*", SearchOption.AllDirectories);
+            var allFiles = Directory.GetFileSystemEntries(_startPosition, "*.*", SearchOption.AllDirectories);
 
             foreach (var item in allFiles)
             {
                 bool isDir = Directory.Exists(item);
                 var arg = new CharachteristicsOfItems();
+                result.Add(item);
                 if (isDir)
                 {
-                    OnDirectoryFinded?.Invoke(this, item);
-                    if (search_Pattern(item))
+                    OnDirectoryFinded?.Invoke(this, item);                    
+                    if (_searchPattern != null)
                     {
-                        OnFilteredDirectoryFinded?.Invoke(item, arg);
-                        if (arg.cancelSearch) return allFiles;
+                        if (_searchPattern(item))
+                        {
+                            OnFilteredDirectoryFinded?.Invoke(item, arg);
+                            if (arg.cancelSearch) return result;
+                        }
                     }
                 }
                 else
                 {
                     OnFileFinded?.Invoke(this, item);
-                    if (search_Pattern(item))
+                    if (_searchPattern != null)
                     {
-                        OnFilteredFileFinded?.Invoke(item, arg);
-                        if (arg.cancelSearch) return allFiles;
+                        if (_searchPattern(item))
+                        {
+                            OnFilteredFileFinded?.Invoke(item, arg);
+                            if (arg.cancelSearch) return result;
+                        }
                     }
                 }
             }
             OnFinish?.Invoke(this, null);
-            return allFiles;
+            return result;
         }        
     }
 }

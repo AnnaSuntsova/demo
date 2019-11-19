@@ -120,21 +120,130 @@ namespace SampleQueries
 
             foreach (var item in list)
             {
-                ObjectDumper.Write($"CustomerName: {item.Customer.CompanyName} " + $"List of suppliers: {string.Join(", ", item.Suppliers.Select(s => s.SupplierName))}");
+                ObjectDumper.Write($"CustomerName: {item.Customer.CompanyName} " + $"Supplier: {string.Join(", ", item.Suppliers.Select(s => s.SupplierName))}");
             }
-
-            //var result = dataSource.Customers.GroupJoin(dataSource.Suppliers,
-            //    c => new { c.City, c.Country },
-            //    s => new { s.City, s.Country },
-            //    (c, s) => new { Customer = c, Suppliers = s });
-
-            //ObjectDumper.Write("With  grouping:\n");
-            //foreach (var c in result)
-            //{
-            //    ObjectDumper.Write($"CustomerId: {c.Customer.CustomerID} " +
-            //                       $"List of suppliers: {string.Join(", ", c.Suppliers.Select(s => s.SupplierName))}");
-            //}
         }
+
+        [Category("Task")]
+        [Title("Linq004")]
+        [Description("This sample returns correspondence list of customers and suppliers locations")]
+
+        public void Linq004()
+        {
+            var list = dataSource.Customers.Where(c=>c.Orders.Any())
+                .Select(
+                c => new
+                {
+                    CustomerID = c.CustomerID,
+                    FirstOrder = c.Orders.OrderBy(t => t.OrderDate).First()
+                }
+                );      
+            
+            foreach (var item in list)
+            {
+                ObjectDumper.Write($"Customer: {item.CustomerID}    First order: Month = {item.FirstOrder.OrderDate.Month} Year = {item.FirstOrder.OrderDate.Year}");
+            }
+        }
+
+        [Category("Task")]
+        [Title("Linq005")]
+        [Description("This sample returns correspondence list of customers and suppliers locations")]
+
+        public void Linq005()
+        {
+            var list = dataSource.Customers.Where(c => c.Orders.Any())
+                .Select(
+                c => new
+                {
+                    TotalOrders=c.Orders.Sum(t=>t.Total),
+                    CustomerID = c.CustomerID,
+                    FirstOrder = c.Orders.OrderBy(t => t.OrderDate).First()
+                }
+                ).OrderByDescending(c=>c.FirstOrder.OrderDate.Year)
+                .ThenByDescending(c => c.FirstOrder.OrderDate.Month)
+                .ThenByDescending(c => c.TotalOrders)
+                .ThenByDescending(c => c.CustomerID);
+
+            foreach (var item in list)
+            {
+                ObjectDumper.Write($"First order: Year = {item.FirstOrder.OrderDate.Year} Month = {item.FirstOrder.OrderDate.Month} TotalOrders = {item.TotalOrders} Customer: {item.CustomerID}");
+            }
+        }
+
+        [Category("Task")]
+        [Title("Linq006")]
+        [Description("This sample returns correspondence list of customers and suppliers locations")]
+
+        public void Linq006()
+        {
+            char[] arrayOfNum = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+            var list = dataSource.Customers.Where
+                (
+                    c =>(c.PostalCode!=null) && (c.PostalCode.IndexOfAny(arrayOfNum) ==-1)
+                    ||(c.Region==null)||(c.Phone.StartsWith("("))
+                )
+                .Select(
+                    c => new
+                    {
+                        CustomerName = c.CustomerID,
+                    }                    
+                );
+
+            foreach (var item in list)
+            {
+               ObjectDumper.Write(item.CustomerName);
+            }
+        }
+
+        [Category("Task")]
+        [Title("Linq007")]
+        [Description("This sample returns correspondence list of customers and suppliers locations")]
+
+        public void Linq007()
+        {
+            var list = from prod in dataSource.Products
+                       group prod by prod.Category into catGroup
+                       from inStockGroup in
+                       (
+                           from prod in catGroup
+                           group prod by prod.UnitsInStock into inStockGroup
+                           from priceGroup in
+                           (
+                                from prod in inStockGroup
+                                group prod by prod.UnitPrice
+                           )
+                           group inStockGroup by catGroup.Key
+                        )
+                       group catGroup by catGroup.Key;
+            //var list = dataSource.Products.GroupBy
+            //    (
+            //        c => c.Category, (category, CatGroup) => new
+            //        {
+            //            Category = category,
+            //            InStock = CatGroup.GroupBy
+            //            (
+            //                t => t.UnitsInStock, (unitsInStock, InStockGroup) => new
+            //                {
+            //                    unitsInStock = unitsInStock,
+            //                    Price = InStockGroup.GroupBy(r => r.UnitPrice)
+            //                }
+            //             )
+            //        }
+            //    );
+
+            foreach (var item in list)
+            {
+                ObjectDumper.Write($"Category: {item.Key}");
+                foreach (var a in item)
+                {
+                    ObjectDumper.Write($"\tUnitsInStock: {a.Key}");
+                    foreach (var b in a)
+                        ObjectDumper.Write($"\t\tUnitPrice: {b.UnitPrice}");
+                }
+
+            }
+        }
+
 
     }
 }

@@ -5,37 +5,41 @@ namespace StringToNumberTests
 {
     public class StringToNumberTests
     {
-        [TestCase(" ", ExpectedResult = typeof(ArgumentException))]
-        public int CheckEmptyString(string source)
+        [Test]
+        public void CheckEmptyString()
         {
             var strToNum=new StringToNumber.StringToNumber();
-            return strToNum.ConvertString(source);
-
-
-           // Assert.Throws<ArgumentException>(()=> strToNum.ConvertString(" "));
+            Assert.Throws<ArgumentException>(()=> strToNum.ConvertString(" "));
         }
 
         [TestCase("123", ExpectedResult = 123)]
         [TestCase("-123", ExpectedResult = -123)]
+        [TestCase("0", ExpectedResult = 0)]
+        [TestCase("2147483647", ExpectedResult = int.MaxValue)]
+        [TestCase("-2147483648", ExpectedResult = int.MinValue)]
         public int CheckCorrectString(string source)
         {
             var strToNum = new StringToNumber.StringToNumber();
             return strToNum.ConvertString(source);
         }
 
-        [Test]
-        public void CheckStringWithNumAndLetters()
+        [TestCase("123!")]
+        [TestCase("2147483648")]
+        [TestCase("-2147483649")]
+        public void CheckArgumentOutOfRange(string source)
         {
             var strToNum = new StringToNumber.StringToNumber();
-            Assert.Throws<ArgumentOutOfRangeException>(() => strToNum.ConvertString("123!"));
+            Assert.Throws<ArgumentOutOfRangeException>(() => strToNum.ConvertString(source));
         }
 
-        [Test]
-        public void CheckStringWithBiggerUlong()
+        [TestCase(null)]
+        [TestCase("")]
+        [TestCase(" ")]
+        public void CheckArgumentExceptin(string source)
         {
             var strToNum = new StringToNumber.StringToNumber();
-            Assert.Throws<ArgumentOutOfRangeException>(() => strToNum.ConvertString("18446744073709551616"));
-        }                                                                                       
+            Assert.Throws<ArgumentException>(() => strToNum.ConvertString(source));
+        }
 
     }
 

@@ -1,9 +1,0 @@
-C:\Learning\Task2\Standart\bin\Debug\netstandard2.0\Standart.deps.json
-C:\Learning\Task2\Standart\bin\Debug\netstandard2.0\Standart.dll
-C:\Learning\Task2\Standart\bin\Debug\netstandard2.0\Standart.pdb
-C:\Learning\Task2\Standart\obj\Debug\netstandard2.0\Standart.csproj.CoreCompileInputs.cache
-C:\Learning\Task2\Standart\obj\Debug\netstandard2.0\Standart.AssemblyInfoInputs.cache
-C:\Learning\Task2\Standart\obj\Debug\netstandard2.0\Standart.AssemblyInfo.cs
-C:\Learning\Task2\Standart\obj\Debug\netstandard2.0\Standart.dll
-C:\Learning\Task2\Standart\obj\Debug\netstandard2.0\Standart.pdb
-C:\Learning\Task2\Standart\obj\Debug\netstandard2.0\Standart.csprojAssemblyReference.cache

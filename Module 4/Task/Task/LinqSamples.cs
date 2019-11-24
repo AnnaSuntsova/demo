@@ -68,7 +68,7 @@ namespace SampleQueries
 
         public void Linq001()
         {
-            const decimal totalVolume = 10000;
+            decimal totalVolume = 10000;
             var clients =
                 from cl in dataSource.Customers
                 from ord in cl.Orders
@@ -79,10 +79,19 @@ namespace SampleQueries
                     CompanyName = ordGroup.Key,
                     TotalOrd=ordGroup.Sum(x=>x.Total)
                 };
+            ObjectDumper.Write($"Total volume is {totalVolume}");
             foreach (var cl in clients)
             {
                 ObjectDumper.Write(cl.CompanyName+" "+cl.TotalOrd);
             }
+
+            totalVolume = 100;
+            ObjectDumper.Write($"Total volume is {totalVolume}");
+            foreach (var cl in clients)
+            {
+                ObjectDumper.Write(cl.CompanyName + " " + cl.TotalOrd);
+            }
+
         }
 
         [Category("Task")]
@@ -215,21 +224,6 @@ namespace SampleQueries
                            group inStockGroup by catGroup.Key
                         )
                        group catGroup by catGroup.Key;
-            //var list = dataSource.Products.GroupBy
-            //    (
-            //        c => c.Category, (category, CatGroup) => new
-            //        {
-            //            Category = category,
-            //            InStock = CatGroup.GroupBy
-            //            (
-            //                t => t.UnitsInStock, (unitsInStock, InStockGroup) => new
-            //                {
-            //                    unitsInStock = unitsInStock,
-            //                    Price = InStockGroup.GroupBy(r => r.UnitPrice)
-            //                }
-            //             )
-            //        }
-            //    );
 
             foreach (var item in list)
             {
@@ -243,6 +237,70 @@ namespace SampleQueries
 
             }
         }
+
+        [Category("Task")]
+        [Title("Linq009")]
+        [Description("This sample returns correspondence list of customers and suppliers locations")]
+
+        public void Linq009()
+        {
+            var list = dataSource.Customers.GroupBy
+                (
+                    c => c.City
+                )
+                .Select(c => new
+                {
+                    City = c.Key,
+                    Profitable = c.Average(p=>p.Orders.Sum(d=>d.Total)),
+                    Intensity=c.Average(p=>p.Orders.Length)
+                }                  
+                );
+
+            foreach (var item in list)
+            {
+                ObjectDumper.Write($"City: {item.City}\t Profitable = {item.Profitable}\t Intensity={item.Intensity}");
+            }
+        }
+
+        [Category("Task")]
+        [Title("Linq0010")]
+        [Description("This sample returns correspondence list of customers and suppliers locations")]
+
+        public void Linq0010()
+        {
+            var list = dataSource.Customers.Select(c => new
+            {
+                Customer = c.CustomerID,
+                ByMonth = c.Orders.GroupBy(d=>d.OrderDate.Month).Select(b=> new { Month=b.Key, OrdCount=b.Count()}),
+                ByYear = c.Orders.GroupBy(d => d.OrderDate.Year).Select(b => new { Year = b.Key, OrdCount = b.Count() }),
+                ByYearAndMonth = c.Orders.GroupBy(d => new { d.OrderDate.Year, d.OrderDate.Month })
+                .Select(b => new { Year=b.Key.Year, Month = b.Key.Month, OrdCount = b.Count() }),
+            }
+
+            );
+
+            foreach (var item in list)
+            {
+                ObjectDumper.Write($"Customer: {item.Customer}");
+                ObjectDumper.Write("\tMonths statistic:\n");
+                foreach (var m in item.ByMonth)
+                {
+                    ObjectDumper.Write($"\t\tMonth: {m.Month} Orders count: {m.OrdCount}");
+                }
+                ObjectDumper.Write("\tYears statistic:\n");
+                foreach (var y in item.ByYear)
+                {
+                    ObjectDumper.Write($"\t\tYear: {y.Year} Orders count: {y.OrdCount}");
+                }
+                ObjectDumper.Write("\tYear and month statistic:\n");
+                foreach (var ym in item.ByYearAndMonth)
+                {
+                    ObjectDumper.Write($"\t\tYear: {ym.Year} Month: {ym.Month} Orders count: {ym.OrdCount}");
+                }
+            }
+        }
+
+
 
 
     }

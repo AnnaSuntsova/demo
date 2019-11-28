@@ -7,6 +7,9 @@ using System.Text;
 using System.Threading.Tasks;
 using FileWatcher.Resources;
 using System.Configuration;
+using System.Globalization;
+using System.Threading;
+using resources = FileWatcher.Resources.Resource;
 
 namespace FileWatcher
 {
@@ -14,8 +17,8 @@ namespace FileWatcher
     {
         static void Main(string[] args)
         {
-            var configSection = (UserConfigSection)ConfigurationManager.GetSection("simpleSection");
-
+            var configSection = (UserConfigSection)ConfigurationManager.GetSection("customSection");
+            Thread.CurrentThread.CurrentUICulture = new CultureInfo(configSection.InterfaceCulture);
             RunWatching();
         }
 
@@ -29,26 +32,25 @@ namespace FileWatcher
 
             [ConfigurationProperty("rulesForFiles")]
             public List<FileInfo> RulesForFiles => (List<FileInfo>)base["rulesForFiles"];
-        }
-        
+        }        
 
         private static void RunWatching()
         {
-            var systemWatcher=new FileSystemWatcher();
-            systemWatcher.Path = @"D:\Info";
-            systemWatcher.NotifyFilter = NotifyFilters.LastAccess;
-            systemWatcher.Filter = "*.*";
+            var systemWatcher = new FileSystemWatcher
+            {
+                Path = @"D:\Info",
+                NotifyFilter = NotifyFilters.LastAccess,
+                Filter = "*.*",
+                EnableRaisingEvents = true
+            };
             systemWatcher.Created += SystemWatcher_Created;
-            systemWatcher.EnableRaisingEvents = true;
         }
-
         
         private static void SystemWatcher_Created(object sender, FileSystemEventArgs e)
         {
-            var configSection = (UserConfigSection)ConfigurationManager.GetSection("simpleSection");
-            //var rm= new ResourceManager ()
-            //Console.WriteLine(ResourceEn.FileCreated);
-            var newPath = Path.Combine(Path.GetTempPath(), Path.GetFileName(e.Name));
+            string newPath;
+            var configSection = (UserConfigSection)ConfigurationManager.GetSection("simpleSection");            
+            Console.WriteLine(resources.FileCreated);            
 
             //поиск правила
             foreach (var rule in configSection.RulesForFiles)
@@ -56,15 +58,18 @@ namespace FileWatcher
                     
             }
 
-            if (false) Console.Write(ResourceEn.RuleNotFound);
+            if (false)
+            {
+                Console.Write(resources.RuleNotFound);
+                newPath = Path.Combine(Path.GetTempPath(), Path.GetFileName(e.Name));
+            }
             else
             {
-                Console.WriteLine(ResourceEn.RuleFound);
+                Console.WriteLine(resources.RuleFound);
+                newPath= Path.Combine(Path.GetTempPath(), Path.GetFileName(e.Name));
                 File.Move(e.Name, newPath);
-                Console.WriteLine(ResourceEn.FileTransferToDestination);
-            }
-
-            
+                Console.WriteLine(resources.FileTransferToDestination);
+            }            
         }
     }
 }

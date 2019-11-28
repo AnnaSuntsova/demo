@@ -118,21 +118,15 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="FileCreated" xml:space="preserve">
-    <value>File was created</value>
+    <value>Файл создан</value>
   </data>
   <data name="FileTransferToDestination" xml:space="preserve">
-    <value>File was transfered to destination</value>
+    <value>Файл перемещён в папку назначения</value>
   </data>
   <data name="RuleFound" xml:space="preserve">
-    <value>Rule was found</value>
+    <value>Правило найдено</value>
   </data>
   <data name="RuleNotFound" xml:space="preserve">
-    <value>Rule was not found</value>
-  </data>
-  <data name="FileWatcher_SystemWatcher_Created_File_was_transfered" xml:space="preserve">
-    <value>File was transfered</value>
-  </data>
-  <data name="Created_File_was_transfered" xml:space="preserve">
-    <value>File was transfered</value>
+    <value>Правило не найдено</value>
   </data>
 </root>

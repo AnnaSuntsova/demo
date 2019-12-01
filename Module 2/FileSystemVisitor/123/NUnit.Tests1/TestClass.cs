@@ -96,7 +96,7 @@ namespace NUnit.Tests1
         public void CheckOfEventsCountWithoutFilters()
         {
             countOfEvents = 0;
-            FileSystemVisitor.FileSystemVisitor _systemVisitor = new FileSystemVisitor.FileSystemVisitor(@"D:\Info");
+            FileSystemVisitor _systemVisitor = new FileSystemVisitor.FileSystemVisitor(@"D:\Info");
             _systemVisitor.OnStart += _systemVisitor_OnStart;
             _systemVisitor.OnFinish += _systemVisitor_OnFinish;
             _systemVisitor.OnFileFinded += SystemVisitor_OnFileFinded;

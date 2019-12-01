@@ -120,7 +120,10 @@
   <data name="FileCreated" xml:space="preserve">
     <value>Файл создан</value>
   </data>
-  <data name="FileTransferToDestination" xml:space="preserve">
+  <data name="FileMoveToDefaultFolder" xml:space="preserve">
+    <value>Файл перемещён в папку "по умолчанию"</value>
+  </data>
+  <data name="FileMoveToDestination" xml:space="preserve">
     <value>Файл перемещён в папку назначения</value>
   </data>
   <data name="RuleFound" xml:space="preserve">

@@ -70,11 +70,20 @@ namespace FileWatcher.Resources {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на File was transfered to destination.
+        ///   Ищет локализованную строку, похожую на File was moved to default folder.
         /// </summary>
-        internal static string FileTransferToDestination {
+        internal static string FileMoveToDefaultFolder {
             get {
-                return ResourceManager.GetString("FileTransferToDestination", resourceCulture);
+                return ResourceManager.GetString("FileMoveToDefaultFolder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на File was moved to destination.
+        /// </summary>
+        internal static string FileMoveToDestination {
+            get {
+                return ResourceManager.GetString("FileMoveToDestination", resourceCulture);
             }
         }
         

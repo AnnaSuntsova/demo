@@ -120,8 +120,11 @@
   <data name="FileCreated" xml:space="preserve">
     <value>File was created</value>
   </data>
-  <data name="FileTransferToDestination" xml:space="preserve">
-    <value>File was transfered to destination</value>
+  <data name="FileMoveToDefaultFolder" xml:space="preserve">
+    <value>File was moved to default folder</value>
+  </data>
+  <data name="FileMoveToDestination" xml:space="preserve">
+    <value>File was moved to destination</value>
   </data>
   <data name="RuleFound" xml:space="preserve">
     <value>Rule was found</value>

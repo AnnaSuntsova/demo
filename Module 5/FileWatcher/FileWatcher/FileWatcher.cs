@@ -10,66 +10,65 @@ using System.Configuration;
 using System.Globalization;
 using System.Threading;
 using resources = FileWatcher.Resources.Resource;
+using System.Text.RegularExpressions;
 
 namespace FileWatcher
 {
     class FileWatcher
     {
+        static UserConfigSection configSection = (UserConfigSection)ConfigurationManager.GetSection("customSection");
+
         static void Main(string[] args)
         {
-            var configSection = (UserConfigSection)ConfigurationManager.GetSection("customSection");
-            Thread.CurrentThread.CurrentUICulture = new CultureInfo(configSection.InterfaceCulture);
+            Thread.CurrentThread.CurrentUICulture = new CultureInfo(configSection.Culture);
             RunWatching();
-        }
-
-        private class UserConfigSection : ConfigurationSection
-        {
-            [ConfigurationProperty("interfCulture")]
-            public string InterfaceCulture => (string) base["interfCulture"];
-
-            [ConfigurationProperty("observFolders")]
-            public List<FileInfo> ObservingFolders => (List<FileInfo>)base["observFolders"];
-
-            [ConfigurationProperty("rulesForFiles")]
-            public List<FileInfo> RulesForFiles => (List<FileInfo>)base["rulesForFiles"];
-        }        
+            while (true) { }
+        }       
 
         private static void RunWatching()
         {
-            var systemWatcher = new FileSystemWatcher
+            var numOfWatch = configSection.FolderItems.Count;
+            var num = 0;
+            foreach (FolderElement folder in configSection.FolderItems)
             {
-                Path = @"D:\Info",
-                NotifyFilter = NotifyFilters.LastAccess,
-                Filter = "*.*",
-                EnableRaisingEvents = true
-            };
-            systemWatcher.Created += SystemWatcher_Created;
+                var tempPath = Path.Combine(Path.GetTempPath(), folder.Name);
+                if (!Directory.Exists(tempPath)) Directory.CreateDirectory(tempPath);
+                FileSystemWatcher systemWatchers = new FileSystemWatcher();
+                systemWatchers.Path = tempPath;
+                systemWatchers.EnableRaisingEvents = true;
+                systemWatchers.Created += SystemWatcher_Created;
+                num++;
+            }
         }
-        
+
         private static void SystemWatcher_Created(object sender, FileSystemEventArgs e)
         {
             string newPath;
-            var configSection = (UserConfigSection)ConfigurationManager.GetSection("simpleSection");            
-            Console.WriteLine(resources.FileCreated);            
+            var isRuleFound = false;
+            Console.WriteLine(resources.FileCreated);
 
-            //поиск правила
-            foreach (var rule in configSection.RulesForFiles)
+            foreach (RuleElement rule in configSection.RulesForFiles)
             {
-                    
+                if (Regex.IsMatch(e.Name, rule.Rule, RegexOptions.IgnoreCase))
+                {
+                    Console.WriteLine(resources.RuleFound);
+                    newPath = Path.Combine(Path.GetTempPath(), rule.Destination);
+                    if (!Directory.Exists(newPath)) Directory.CreateDirectory(newPath);                                       
+                    File.Move(e.Name, newPath);
+                    Console.WriteLine(resources.FileMoveToDestination);
+                    isRuleFound = true;
+                }               
             }
-
-            if (false)
+            if (!isRuleFound)
             {
-                Console.Write(resources.RuleNotFound);
-                newPath = Path.Combine(Path.GetTempPath(), Path.GetFileName(e.Name));
+                Console.WriteLine(resources.RuleNotFound);
+                newPath = Path.Combine(Path.GetTempPath(), "TempPath");
+                if (!Directory.Exists(newPath)) Directory.CreateDirectory(newPath);
+                var newFileName = Path.Combine(newPath, e.Name);
+                if (File.Exists(newFileName)) File.Delete(newFileName);
+                File.Move(e.FullPath, newFileName);
+                Console.WriteLine(resources.FileMoveToDefaultFolder);
             }
-            else
-            {
-                Console.WriteLine(resources.RuleFound);
-                newPath= Path.Combine(Path.GetTempPath(), Path.GetFileName(e.Name));
-                File.Move(e.Name, newPath);
-                Console.WriteLine(resources.FileTransferToDestination);
-            }            
         }
     }
 }

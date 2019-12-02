@@ -89,16 +89,16 @@ namespace FileWatcher
             get { return ((string)(base["destination"])); }
         }
 
-        [ConfigurationProperty("addNumber", DefaultValue = "", IsKey = false)]
-        public string AddNumber
+        [ConfigurationProperty("addNumber", DefaultValue = "false", IsKey = false)]
+        public bool AddNumber
         {
-            get { return ((string)(base["addNumber"])); }
+            get { return ((bool)(base["addNumber"])); }
         }
 
-        [ConfigurationProperty("addDate", DefaultValue = "", IsKey = false)]
-        public string AddDate
+        [ConfigurationProperty("addDate", DefaultValue = "false", IsKey = false)]
+        public bool AddDate
         {
-            get { return ((string)(base["addDate"])); }
+            get { return ((bool)(base["addDate"])); }
         }
     }
 }

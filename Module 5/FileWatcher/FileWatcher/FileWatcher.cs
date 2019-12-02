@@ -5,7 +5,6 @@ using System.Linq;
 using System.Resources;
 using System.Text;
 using System.Threading.Tasks;
-using FileWatcher.Resources;
 using System.Configuration;
 using System.Globalization;
 using System.Threading;
@@ -17,10 +16,11 @@ namespace FileWatcher
     class FileWatcher
     {
         static UserConfigSection configSection = (UserConfigSection)ConfigurationManager.GetSection("customSection");
+        static int numOfFiles = 0;
 
         static void Main(string[] args)
         {
-            Thread.CurrentThread.CurrentUICulture = new CultureInfo(configSection.Culture);
+            Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-EN");
             RunWatching();
             while (true) { }
         }       
@@ -41,32 +41,38 @@ namespace FileWatcher
             }
         }
 
-        private static void SystemWatcher_Created(object sender, FileSystemEventArgs e)
+        static void MoveToNewPath (string nameOfFile, string destin, bool addDate, bool addNumber)
         {
-            string newPath;
+            numOfFiles++;
+            var tempName = Path.GetFileName(nameOfFile);
+            var newPath = Path.Combine(Path.GetTempPath(), destin);
+            if (!Directory.Exists(newPath)) Directory.CreateDirectory(newPath);
+            if (addDate) tempName = string.Concat(Path.GetFileNameWithoutExtension(nameOfFile),"_", DateTimeOffset.Now.Date.ToShortDateString(), Path.GetExtension(nameOfFile));
+            if (addNumber) tempName = string.Concat(Path.GetFileNameWithoutExtension(nameOfFile),"_", numOfFiles.ToString(), Path.GetExtension(nameOfFile));
+            newPath = Path.Combine(newPath, tempName);
+            if (File.Exists(newPath)) File.Delete(newPath);
+            File.Move(Path.GetFullPath(nameOfFile), newPath);
+        }
+
+        private static void SystemWatcher_Created(object sender, FileSystemEventArgs e)
+        {            
             var isRuleFound = false;
             Console.WriteLine(resources.FileCreated);
-
             foreach (RuleElement rule in configSection.RulesForFiles)
             {
                 if (Regex.IsMatch(e.Name, rule.Rule, RegexOptions.IgnoreCase))
                 {
                     Console.WriteLine(resources.RuleFound);
-                    newPath = Path.Combine(Path.GetTempPath(), rule.Destination);
-                    if (!Directory.Exists(newPath)) Directory.CreateDirectory(newPath);                                       
-                    File.Move(e.Name, newPath);
+                    MoveToNewPath(e.FullPath, rule.Destination, rule.AddDate, rule.AddNumber);
                     Console.WriteLine(resources.FileMoveToDestination);
                     isRuleFound = true;
+                    break;
                 }               
             }
             if (!isRuleFound)
             {
                 Console.WriteLine(resources.RuleNotFound);
-                newPath = Path.Combine(Path.GetTempPath(), "TempPath");
-                if (!Directory.Exists(newPath)) Directory.CreateDirectory(newPath);
-                var newFileName = Path.Combine(newPath, e.Name);
-                if (File.Exists(newFileName)) File.Delete(newFileName);
-                File.Move(e.FullPath, newFileName);
+                MoveToNewPath(e.FullPath, "TempPath", false, false);
                 Console.WriteLine(resources.FileMoveToDefaultFolder);
             }
         }

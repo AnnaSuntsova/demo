@@ -20,7 +20,8 @@ namespace FileWatcher
 
         static void Main(string[] args)
         {
-            Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-EN");
+            CultureInfo.DefaultThreadCurrentCulture = new CultureInfo(configSection.Culture);
+            CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo(configSection.Culture);
             RunWatching();
             while (true) { }
         }       
@@ -50,6 +51,7 @@ namespace FileWatcher
             if (addDate) tempName = string.Concat(Path.GetFileNameWithoutExtension(nameOfFile),"_", DateTimeOffset.Now.Date.ToShortDateString(), Path.GetExtension(nameOfFile));
             if (addNumber) tempName = string.Concat(Path.GetFileNameWithoutExtension(nameOfFile),"_", numOfFiles.ToString(), Path.GetExtension(nameOfFile));
             newPath = Path.Combine(newPath, tempName);
+            newPath = newPath.Replace("/", ".");
             if (File.Exists(newPath)) File.Delete(newPath);
             File.Move(Path.GetFullPath(nameOfFile), newPath);
         }

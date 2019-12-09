@@ -16,6 +16,12 @@ namespace FileWatcher
             get { return ((string)base["culture"]); }
         }
 
+        [ConfigurationProperty("defaultFolder")]
+        public string defaultFolder
+        {
+            get { return ((string)base["defaultFolder"]); }
+        }
+
         [ConfigurationProperty("rulesForFiles")]
         public RulesCollection RulesForFiles
         {
@@ -41,7 +47,7 @@ namespace FileWatcher
         {
             return ((FolderElement)(element)).Name;
         }
-    }    
+    }
 
     [ConfigurationCollection(typeof(RuleElement))]
     public class RulesCollection : ConfigurationElementCollection
@@ -63,15 +69,6 @@ namespace FileWatcher
         public string Name
         {
             get { return ((string)(base["name"])); }
-        }
-    }
-
-    public class CultureElement : ConfigurationElement
-    {
-        [ConfigurationProperty("culture", DefaultValue = "En", IsKey = true)]
-        public string Culture
-        {
-            get { return ((string)(base["culture"])); }
         }
     }
 

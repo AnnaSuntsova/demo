@@ -6,16 +6,38 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using resources = FileWatcher.Resources.Resource;
 using System.Threading.Tasks;
 
 namespace FileWatcher
 {
     public class WatcherActions
     {
+        public event EventHandler OnFileCreated;
+        public event EventHandler OnRuleFound;
+        public event EventHandler OnRuleNotFound;
+        public event EventHandler OnFileMovedToDestinstion;
+        public event EventHandler OnFileMovedToDefault;
+
         static UserConfigSection configSection = (UserConfigSection)ConfigurationManager.GetSection("customSection");
         static int _numOfFiles;
         private static string _defFolder=configSection.defaultFolder;
+
+        public void RunWatching()
+        {
+            CultureInfo.DefaultThreadCurrentCulture = new CultureInfo(configSection.Culture);
+            CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo(configSection.Culture);
+            foreach (FolderElement folder in configSection.FolderItems)
+            {
+                var tempPath = Path.Combine(Path.GetTempPath(), folder.Name);
+                if (!Directory.Exists(tempPath)) Directory.CreateDirectory(tempPath);
+                var systemWatchers = new FileSystemWatcher
+                {
+                    Path = tempPath,
+                    EnableRaisingEvents = true
+                };
+                systemWatchers.Created += SystemWatcher_Created;
+            }
+        }
 
         private static void MoveToNewPath(string nameOfFile, string destin, bool addDate, bool addNumber)
         {
@@ -31,26 +53,26 @@ namespace FileWatcher
             File.Move(Path.GetFullPath(nameOfFile), newPath);
         }
 
-        public static void SystemWatcher_Created(object sender, FileSystemEventArgs e)
+        public void SystemWatcher_Created(object sender, FileSystemEventArgs e)
         {
             var isRuleFound = false;
-            Console.WriteLine(resources.FileCreated);
+            OnFileCreated?.Invoke(this, null);
             foreach (RuleElement rule in configSection.RulesForFiles)
             {
                 if (Regex.IsMatch(e.Name, rule.Rule, RegexOptions.IgnoreCase))
                 {
-                    Console.WriteLine(resources.RuleFound);
+                    OnRuleFound?.Invoke(this, null);
                     MoveToNewPath(e.FullPath, rule.Destination, rule.AddDate, rule.AddNumber);
-                    Console.WriteLine(resources.FileMoveToDestination);
+                    OnFileMovedToDestinstion?.Invoke(this, null);
                     isRuleFound = true;
                     break;
                 }
             }
             if (!isRuleFound)
             {
-                Console.WriteLine(resources.RuleNotFound);
+                OnRuleNotFound?.Invoke(this, null);
                 MoveToNewPath(e.FullPath, _defFolder, false, false);
-                Console.WriteLine(resources.FileMoveToDefaultFolder);
+                OnFileMovedToDefault?.Invoke(this, null);
             }
         }
     }

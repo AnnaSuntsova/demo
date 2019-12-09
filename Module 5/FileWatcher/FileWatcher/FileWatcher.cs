@@ -3,6 +3,7 @@ using System.IO;
 using System.Configuration;
 using System.Globalization;
 using System.Text.RegularExpressions;
+using resources = FileWatcher.Resources.Resource;
 
 namespace FileWatcher
 {
@@ -11,24 +12,39 @@ namespace FileWatcher
         static UserConfigSection configSection = (UserConfigSection)ConfigurationManager.GetSection("customSection");
         static void Main(string[] args)
         {
-            RunWatching();
+            var watcherAct = new WatcherActions();
+            watcherAct.OnFileCreated += WatcherAct_OnFileCreated;
+            watcherAct.OnRuleFound += WatcherAct_OnRuleFound;
+            watcherAct.OnRuleNotFound += WatcherAct_OnRuleNotFound;
+            watcherAct.OnFileMovedToDefault += WatcherAct_OnFileMovedToDefault;
+            watcherAct.OnFileMovedToDestinstion += WatcherAct_OnFileMovedToDestinstion;
+            watcherAct.RunWatching();
             while (true) { }
         }
-        public static void RunWatching()
+
+        private static void WatcherAct_OnFileMovedToDestinstion(object sender, EventArgs e)
         {
-            CultureInfo.DefaultThreadCurrentCulture = new CultureInfo(configSection.Culture);
-            CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo(configSection.Culture);
-            foreach (FolderElement folder in configSection.FolderItems)
-            {
-                var tempPath = Path.Combine(Path.GetTempPath(), folder.Name);
-                if (!Directory.Exists(tempPath)) Directory.CreateDirectory(tempPath);
-                var systemWatchers = new FileSystemWatcher
-                {
-                    Path = tempPath,
-                    EnableRaisingEvents = true
-                };
-                systemWatchers.Created += WatcherActions.SystemWatcher_Created;
-            }
+            Console.WriteLine(resources.FileMoveToDestination);
+        }
+
+        private static void WatcherAct_OnFileMovedToDefault(object sender, EventArgs e)
+        {
+            Console.WriteLine(resources.FileMoveToDefaultFolder);
+        }
+
+        private static void WatcherAct_OnRuleNotFound(object sender, EventArgs e)
+        {
+            Console.WriteLine(resources.RuleNotFound);
+        }
+
+        private static void WatcherAct_OnRuleFound(object sender, EventArgs e)
+        {
+            Console.WriteLine(resources.RuleFound);
+        }
+
+        private static void WatcherAct_OnFileCreated(object sender, EventArgs e)
+        {
+            Console.WriteLine(resources.FileCreated);
         }
     }
 }

@@ -8,5 +8,16 @@ namespace IoCSample
 {
 	public class CustomerBLL
 	{
-	}
+        public string Message { get; set; }
+
+        public CustomerBLL()
+        {
+            Message = "Hello world!";
+        }         
+
+        public void WelcomeWorld()
+        {
+            Console.WriteLine(Message);
+        }
+    }
 }

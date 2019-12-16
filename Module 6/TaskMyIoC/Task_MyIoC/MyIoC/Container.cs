@@ -9,16 +9,47 @@ namespace MyIoC
 {
 	public class Container
 	{
-        private IDictionary<Type, Type> _types;
+        private IDictionary<Type, Type> _types = new Dictionary<Type, Type>();
 
 		public void AddAssembly(Assembly assembly)
 		{
             Type[] types = assembly.GetExportedTypes();
             foreach (var type in types)
-                AddType(type, type);
+            {
+                var constImportAttribute = type.GetCustomAttribute<ImportConstructorAttribute>();
+                if (constImportAttribute != null)
+                {
+                    _types.Add(type, type);
+                }
+                else
+                {
+                    throw new NoConstructorAttributes("No constructor attributes for import");
+                }
+
+                if (GetProperties (type))
+                {
+                    _types.Add(type, type);
+                }
+
+                var exportAttributes = type.GetCustomAttributes<ExportAttribute>();
+                if (exportAttributes == null)
+                {
+                    throw new NoConstructorAttributes("No constructor attributes for export");
+                }
+                foreach (var exportAttribute in exportAttributes)
+                {
+                    _types.Add(type, type);
+                }
+            }                
         }
 
-		public void AddType(Type type)
+        private bool GetProperties(Type type)
+        {
+            var property = type.GetProperties().Where(p => p.GetCustomAttributes<ImportAttribute>() != null);
+            return property.Any();
+        }
+
+        public void AddType(Type type)
 		{
             _types.Add(type, type);
         }
@@ -26,7 +57,6 @@ namespace MyIoC
 		public void AddType(Type type, Type baseType)
 		{
             _types.Add(baseType, type);
-
         }
 
 		public object CreateInstance(Type type)
@@ -50,7 +80,7 @@ namespace MyIoC
             ConstructorInfo[] constructors = type.GetConstructors();
             if (constructors.Length==0)
             {
-                throw new Exception("There are no constructors");
+                throw new ConstructorNotFoundException("There are no constructors");
             }
             return constructors.First();   
         }

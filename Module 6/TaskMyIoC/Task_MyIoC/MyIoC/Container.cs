@@ -21,32 +21,20 @@ namespace MyIoC
                 {
                     _types.Add(type, type);
                 }
-                else
-                {
-                    throw new NoConstructorAttributes("No constructor attributes for import");
-                }
-
-                if (GetProperties (type))
-                {
-                    _types.Add(type, type);
-                }
-
                 var exportAttributes = type.GetCustomAttributes<ExportAttribute>();
-                if (exportAttributes == null)
-                {
-                    throw new NoConstructorAttributes("No constructor attributes for export");
-                }
                 foreach (var exportAttribute in exportAttributes)
                 {
-                    _types.Add(type, type);
+                    if (exportAttribute.Contract != null)
+                    {
+                        _types.Add(type, type);
+                    }
                 }
             }                
         }
 
-        private bool GetProperties(Type type)
+        private IEnumerable<PropertyInfo> GetProperties(Type type)
         {
-            var property = type.GetProperties().Where(p => p.GetCustomAttributes<ImportAttribute>() != null);
-            return property.Any();
+            return type.GetProperties().Where(p => p.GetCustomAttributes<ImportAttribute>() != null);            
         }
 
         public void AddType(Type type)
@@ -66,22 +54,39 @@ namespace MyIoC
 
         private object GetInstance(Type type)
         {
-            ConstructorInfo constructorInfo = GetConstructor(type);
+            if (!_types.ContainsKey(type))
+                throw new TypeNotRegisteredException();
+            Type dependType = _types[type];
+            ConstructorInfo constructorInfo = GetConstructor(dependType);
+            object instance = CreateFromConstructor(dependType, constructorInfo);
+
+            if (dependType.GetCustomAttribute<ImportConstructorAttribute>() != null)
+            {
+                return instance;
+            }
+
+            var propertiesInfo = GetProperties(dependType);
+            foreach (var property in propertiesInfo)
+            {
+                var resProperty = GetInstance(property.PropertyType);
+                property.SetValue(instance, resProperty);
+            }            
+            return instance;
+        }
+
+        private object CreateFromConstructor(Type dependType, ConstructorInfo constructorInfo)
+        {
             ParameterInfo[] parameters = constructorInfo.GetParameters();
-            var parameterOfConstructor = new List<object>();
-            foreach (var parameter in parameters)
-                parameterOfConstructor.Add(parameter.ParameterType);
-            object instance = Activator.CreateInstance(type, parameterOfConstructor);
+            List<object> parametersInstances = new List<object>(parameters.Length);
+            foreach (var param in parameters)
+                parametersInstances.Add(GetInstance(param.ParameterType));
+            object instance = Activator.CreateInstance(dependType, parametersInstances.ToArray());
             return instance;
         }
 
         private ConstructorInfo GetConstructor(Type type)
         {
-            ConstructorInfo[] constructors = type.GetConstructors();
-            if (constructors.Length==0)
-            {
-                throw new ConstructorNotFoundException("There are no constructors");
-            }
+            ConstructorInfo[] constructors = type.GetConstructors();            
             return constructors.First();   
         }
 

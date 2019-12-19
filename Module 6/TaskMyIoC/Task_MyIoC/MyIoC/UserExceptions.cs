@@ -8,7 +8,7 @@ namespace MyIoC
 {
     public class TypeNotRegisteredException : Exception
     {
-        public TypeNotRegisteredException ()
+        public TypeNotRegisteredException()
         { }
     }
 }

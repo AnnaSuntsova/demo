@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace MyIoC
 {
-	public class Container
-	{
+    public class Container
+    {
         private IDictionary<Type, Type> _types = new Dictionary<Type, Type>();
 
-		public void AddAssembly(Assembly assembly)
-		{
+        public void AddAssembly(Assembly assembly)
+        {
             Type[] types = assembly.GetExportedTypes();
             foreach (var type in types)
             {
@@ -21,33 +21,41 @@ namespace MyIoC
                 {
                     _types.Add(type, type);
                 }
+                if (GetProperties(type).Any())
+                {
+                    _types.Add(type, type);
+                }
                 var exportAttributes = type.GetCustomAttributes<ExportAttribute>();
                 foreach (var exportAttribute in exportAttributes)
                 {
                     if (exportAttribute.Contract != null)
                     {
+                        _types.Add(exportAttribute.Contract, type);
+                    }
+                    else
+                    {
                         _types.Add(type, type);
                     }
                 }
-            }                
+            }
         }
 
         private IEnumerable<PropertyInfo> GetProperties(Type type)
         {
-            return type.GetProperties().Where(p => p.GetCustomAttributes<ImportAttribute>() != null);            
+            return type.GetProperties().Where(p => p.GetCustomAttributes<ImportAttribute>() != null);
         }
 
         public void AddType(Type type)
-		{
+        {
             _types.Add(type, type);
         }
 
-		public void AddType(Type type, Type baseType)
-		{
+        public void AddType(Type type, Type baseType)
+        {
             _types.Add(baseType, type);
         }
 
-		public object CreateInstance(Type type)
+        public object CreateInstance(Type type)
         {
             return GetInstance(type);
         }
@@ -70,7 +78,7 @@ namespace MyIoC
             {
                 var resProperty = GetInstance(property.PropertyType);
                 property.SetValue(instance, resProperty);
-            }            
+            }
             return instance;
         }
 
@@ -86,27 +94,27 @@ namespace MyIoC
 
         private ConstructorInfo GetConstructor(Type type)
         {
-            ConstructorInfo[] constructors = type.GetConstructors();            
-            return constructors.First();   
+            ConstructorInfo[] constructors = type.GetConstructors();
+            return constructors.First();
         }
 
         public T CreateInstance<T>()
-		{
+        {
             var type = typeof(T);
             return (T)GetInstance(type);
         }
 
-		public void Sample()
-		{
-			var container = new Container();
-			container.AddAssembly(Assembly.GetExecutingAssembly());
+        public void Sample()
+        {
+            var container = new Container();
+            container.AddAssembly(Assembly.GetExecutingAssembly());
 
-			var customerBLL = (CustomerBLL)container.CreateInstance(typeof(CustomerBLL));
-			var customerBLL2 = container.CreateInstance<CustomerBLL>();
+            var customerBLL = (CustomerBLL)container.CreateInstance(typeof(CustomerBLL));
+            var customerBLL2 = container.CreateInstance<CustomerBLL>();
 
-			container.AddType(typeof(CustomerBLL));
-			container.AddType(typeof(Logger));
-			container.AddType(typeof(CustomerDAL), typeof(ICustomerDAL));
-		}
-	}
+            container.AddType(typeof(CustomerBLL));
+            container.AddType(typeof(Logger));
+            container.AddType(typeof(CustomerDAL), typeof(ICustomerDAL));
+        }
+    }
 }

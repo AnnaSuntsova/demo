@@ -36,7 +36,7 @@ namespace Tests
         public void GetAssemblyAndCheckInstance ()
         {
             var container = new Container();
-            container.AddAssembly(Assembly.GetExecutingAssembly());
+            container.AddAssembly(Assembly.Load("MyIoC"));
 
             var customerBll = container.CreateInstance<CustomerBLL>();
 

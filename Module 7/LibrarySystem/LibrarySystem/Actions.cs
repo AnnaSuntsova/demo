@@ -204,6 +204,13 @@ namespace LibrarySystem
             }
         }
 
+        private void CheckValidation()
+        {
+            XmlReaderSettings catalogSettings = new XmlReaderSettings();
+            catalogSettings.Schemas.Add();
+
+        }
+
 
     }
 }

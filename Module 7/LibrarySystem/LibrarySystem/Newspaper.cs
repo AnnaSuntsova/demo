@@ -17,5 +17,28 @@ namespace LibrarySystem
         public int Number { get; set; }
         public DateTime Date { get; set; }
         public string ISSN { get; set; }
+
+        public Newspaper(string name, string publicationPlace, string publisher, int publicationYear, int pageCount, string notes, int number, DateTime date, string issn)
+        {
+            if (string.IsNullOrWhiteSpace(issn))
+            {
+                throw new ArgumentOutOfRangeException();
+            }
+            else
+            {
+                Name = name;
+                PublicationPlace = publicationPlace;
+                Publisher = publisher;
+                PublicationYear = publicationYear;
+                PageCount = pageCount;
+                Notes = notes;
+                Number = number;
+                Date = date;
+                ISSN = issn;
+            }
+        }
+
+        public Newspaper()
+        { }
     }
 }

@@ -4,19 +4,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using System.Xml.Schema;
 
 namespace LibrarySystem
 {
     class Actions
     {
-        //public string Name { get; set; }
-        //public string[] Authors { get; set; }
-        //public string PublicationPlace { get; set; }
-        //public string Publisher { get; set; }
-        //public int PublicationYear { get; set; }
-        //public int pageCount { get; set; }
-        //public string Notes { get; set; }
-        //public string ISBN { get; set; }
+        private List<Book> books = new List<Book>();
+        private List<Newspaper> newspapers = new List<Newspaper>();
+        private List<Patent> patents = new List<Patent>();
+
         public void ReadBooks ()
         {
             var reader = XmlReader.Create("library.xml");
@@ -24,35 +21,30 @@ namespace LibrarySystem
             while (reader.ReadToNextSibling("book"))
             {
                 reader.ReadToDescendant("name");
-                //output
+                var name = reader.ReadElementContentAsString();
+                var authors = new List<string>();
                 while (reader.ReadToNextSibling("authors"))
                 {
                     reader.ReadToDescendant("author");
+                    authors.Add(reader.ReadElementContentAsString());
                 }
                 reader.ReadToDescendant("publicationPlace");
-                //output
+                var publicationPlace = reader.ReadElementContentAsString();
                 reader.ReadToDescendant("publisher");
-                //output
+                var publisher = reader.ReadElementContentAsString();
                 reader.ReadToDescendant("publicationYear");
-                //output
+                var publicationYear = reader.ReadElementContentAsInt();
                 reader.ReadToDescendant("pageCount");
-                //output
+                var pageCount = reader.ReadElementContentAsInt();
                 reader.ReadToDescendant("notes");
-                //output
+                var notes = reader.ReadElementContentAsString();
                 reader.ReadToDescendant("ISBN");
-                //output
+                var isbn = reader.ReadElementContentAsString();
+                var book = new Book(name, authors, publicationPlace, publisher, publicationYear, pageCount, notes, isbn);
+                books.Add(book);
             }
         }
 
-        //public string Name { get; set; }
-        //public string PublicationPlace { get; set; }
-        //public string Publisher { get; set; }
-        //public int PublicationYear { get; set; }
-        //public int PageCount { get; set; }
-        //public string Notes { get; set; }
-        //public int Number { get; set; }
-        //public DateTime Date { get; set; }
-        //public string ISSN { get; set; }
         public void ReadNewspapers()
         {
             var reader = XmlReader.Create("library.xml");
@@ -60,34 +52,28 @@ namespace LibrarySystem
             while (reader.ReadToNextSibling("newspaper"))
             {
                 reader.ReadToDescendant("name");
-                //output                
+                var name = reader.ReadElementContentAsString();
                 reader.ReadToDescendant("publicationPlace");
-                //output
+                var publicationPlace = reader.ReadElementContentAsString();
                 reader.ReadToDescendant("publisher");
-                //output
+                var publisher = reader.ReadElementContentAsString();
                 reader.ReadToDescendant("publicationYear");
-                //output
+                var publicationYear = reader.ReadElementContentAsInt();
                 reader.ReadToDescendant("pageCount");
-                //output
+                var pageCount = reader.ReadElementContentAsInt();
                 reader.ReadToDescendant("notes");
-                //output
+                var notes = reader.ReadElementContentAsString();
                 reader.ReadToDescendant("number");
-                //output
+                var number = reader.ReadElementContentAsInt();
                 reader.ReadToDescendant("date");
-                //output
+                var date = reader.ReadElementContentAsDateTime();
                 reader.ReadToDescendant("ISSN");
-                //output
+                var issn = reader.ReadElementContentAsString();
+                var newspaper = new Newspaper(name, publicationPlace, publisher, publicationYear, pageCount, notes, number, date, issn);
+                newspapers.Add(newspaper);
             }
         }
 
-        //public string Name { get; set; }
-        //public string[] Inventors { get; set; }
-        //public string City { get; set; }
-        //public int RegistrationNumber { get; set; }
-        //public DateTime ApplicationDate { get; set; }
-        //public DateTime publicationDate { get; set; }
-        //public int PageCount { get; set; }
-        //public string Notes { get; set; }
         public void ReadPatents()
         {
             var reader = XmlReader.Create("library.xml");
@@ -95,34 +81,30 @@ namespace LibrarySystem
             while (reader.ReadToNextSibling("newspaper"))
             {
                 reader.ReadToDescendant("Name");
-                //output    
+                var name = reader.ReadElementContentAsString();
+                var inventors = new List<string>();
                 while (reader.ReadToNextSibling("inventors"))
                 {
                     reader.ReadToDescendant("inventors");
+                    inventors.Add(reader.ReadElementContentAsString());
                 }
                 reader.ReadToDescendant("city");
-                //output
+                var city = reader.ReadElementContentAsString();
                 reader.ReadToDescendant("registrationNumber");
-                //output
+                var registrationNumber = reader.ReadElementContentAsInt();
                 reader.ReadToDescendant("applicationDate");
-                //output
+                var applicationDate = reader.ReadElementContentAsDateTime();
                 reader.ReadToDescendant("publicationDate");
-                //output
+                var publicationDate = reader.ReadElementContentAsDateTime();
                 reader.ReadToDescendant("pageCount");
-                //output
+                var pageCount = reader.ReadElementContentAsInt();
                 reader.ReadToDescendant("notes");
-                //output
+                var notes = reader.ReadElementContentAsString();
+                var patent = new Patent(name, inventors, city, registrationNumber, applicationDate, publicationDate, pageCount, notes);
+                patents.Add(patent);
             }
         }
 
-        //public string Name { get; set; }
-        //public string[] Authors { get; set; }
-        //public string PublicationPlace { get; set; }
-        //public string Publisher { get; set; }
-        //public int PublicationYear { get; set; }
-        //public int pageCount { get; set; }
-        //public string Notes { get; set; }
-        //public string ISBN { get; set; }
         public void WriteBooks ()
         {
             var book = new Book();
@@ -144,15 +126,6 @@ namespace LibrarySystem
             }
         }
 
-        //public string Name { get; set; }
-        //public string PublicationPlace { get; set; }
-        //public string Publisher { get; set; }
-        //public int PublicationYear { get; set; }
-        //public int PageCount { get; set; }
-        //public string Notes { get; set; }
-        //public int Number { get; set; }
-        //public DateTime Date { get; set; }
-        //public string ISSN { get; set; }
         public void WriteNewspapers()
         {
             var newspapers = new Newspaper();
@@ -175,14 +148,6 @@ namespace LibrarySystem
             }
         }
 
-        //public string Name { get; set; }
-        //public string[] Inventors { get; set; }
-        //public string City { get; set; }
-        //public int RegistrationNumber { get; set; }
-        //public DateTime ApplicationDate { get; set; }
-        //public DateTime publicationDate { get; set; }
-        //public int PageCount { get; set; }
-        //public string Notes { get; set; }
         public void WritePatents()
         {
             var patent = new Patent();
@@ -204,6 +169,28 @@ namespace LibrarySystem
             }
         }
 
+        private void CheckValidation()
+        {
+            XmlReaderSettings catalogSettings = new XmlReaderSettings();
+            catalogSettings.Schemas.Add("urn:schemas-microsoft-com:xml-msdata", "catalog.xsd");
+            catalogSettings.ValidationType = ValidationType.Schema;
+            catalogSettings.ValidationEventHandler += new ValidationEventHandler(CatalogSettingsValidationEventHandler);
+            XmlReader catalog = XmlReader.Create("books.xml", catalogSettings);
+            while (catalog.Read()) { }   
+        }
 
+        static void CatalogSettingsValidationEventHandler(object sender, ValidationEventArgs e)
+        {
+            if (e.Severity == XmlSeverityType.Warning)
+            {
+                Console.Write("WARNING: ");
+                Console.WriteLine(e.Message);
+            }
+            else if (e.Severity == XmlSeverityType.Error)
+            {
+                Console.Write("ERROR: ");
+                Console.WriteLine(e.Message);
+            }
+        }
     }
 }

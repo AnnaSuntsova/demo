@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog>
+	<book>
+		<name>Me: Elton John Official Autobiography</name>
+		<author>Elton John</author>
+		<publicationPlace>London</publicationPlace>
+		<publisher>Pan MacMillan</publisher>
+		<publicationYear>2019</publicationYear>
+		<pageCount>384</pageCount>
+		<notes></notes>
+		<ISBN>9781509853311</ISBN>	
+	</book>	
+	<newspaper>
+		<name>The Times</name>
+		<publicationPlace>London</publicationPlace>
+		<publisher>News Corporation</publisher>
+		<publicationYear>2019</publicationYear>
+		<pageCount>28</pageCount>
+		<notes></notes>
+		<number>49</number>
+		<date>12/15/2019</date>
+		<ISSN>0140-0460</ISSN>
+	</newspaper>
+	<patent>
+		<name>MIDDLE BREAKER FOR A TILLAGE IMPLEMENT</name>
+		<inventors>
+				<inventor>Shawn J. BECKER</inventor>
+				<inventor>David L. STEINLAGE</inventor>
+				<inventor>Mark D. BEECK</inventor>
+				<inventor>Andrew J. PETERSON</inventor>
+		</inventors>
+		<city>USA</city>
+		<registrationNumber>16009291</registrationNumber>
+		<applicationDate>06/15/2018</applicationDate>
+		<publicationDate>12/19/2019</publicationDate>
+		<pageCount>12</pageCount>
+		<note>A tillage implement having a frame member extending in a fore-aft direction of the implement, the frame member pivotally connected in a foldable configuration, the frame member comprising a main frame section.</note>
+	</patent>
+</catalog>

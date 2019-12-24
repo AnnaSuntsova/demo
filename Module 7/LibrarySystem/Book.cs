@@ -23,20 +23,18 @@ namespace LibrarySystem
             {
                 throw new ArgumentOutOfRangeException();
             }
-            else
+
+            Name = name;
+            foreach (var author in authors)
             {
-                Name = name;
-                foreach (var author in authors)
-                {
-                    Authors.Add(author);
-                }
-                PublicationPlace = publicationPlace;
-                Publisher = publisher;
-                PublicationYear = publicationYear;
-                PageCount = pageCount;
-                Notes = notes;
-                ISBN = isbn;
+                Authors.Add(author);
             }
+            PublicationPlace = publicationPlace;
+            Publisher = publisher;
+            PublicationYear = publicationYear;
+            PageCount = pageCount;
+            Notes = notes;
+            ISBN = isbn;
         }
 
         public Book()

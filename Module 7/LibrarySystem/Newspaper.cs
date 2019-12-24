@@ -24,18 +24,16 @@ namespace LibrarySystem
             {
                 throw new ArgumentOutOfRangeException();
             }
-            else
-            {
-                Name = name;
-                PublicationPlace = publicationPlace;
-                Publisher = publisher;
-                PublicationYear = publicationYear;
-                PageCount = pageCount;
-                Notes = notes;
-                Number = number;
-                Date = date;
-                ISSN = issn;
-            }
+
+            Name = name;
+            PublicationPlace = publicationPlace;
+            Publisher = publisher;
+            PublicationYear = publicationYear;
+            PageCount = pageCount;
+            Notes = notes;
+            Number = number;
+            Date = date;
+            ISSN = issn;
         }
 
         public Newspaper()

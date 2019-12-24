@@ -23,20 +23,18 @@ namespace LibrarySystem
             {
                 throw new ArgumentOutOfRangeException();
             }
-            else
+
+            Name = name;
+            foreach (var inventor in inventors)
             {
-                Name = name;
-                foreach (var inventor in inventors)
-                {
-                    Inventors.Add(inventor);
-                }
-                City = city;
-                RegistrationNumber = registrationNumber;
-                ApplicationDate = applicationDate;
-                PublicationDate = publicationDate;
-                PageCount = pageCount;
-                Notes = notes;
+                Inventors.Add(inventor);
             }
+            City = city;
+            RegistrationNumber = registrationNumber;
+            ApplicationDate = applicationDate;
+            PublicationDate = publicationDate;
+            PageCount = pageCount;
+            Notes = notes;
         }
 
         public Patent ()

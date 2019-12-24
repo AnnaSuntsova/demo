@@ -8,7 +8,7 @@ using System.Xml.Schema;
 
 namespace LibrarySystem
 {
-    class Actions
+    public class Actions
     {
         private List<Book> books = new List<Book>();
         private List<Newspaper> newspapers = new List<Newspaper>();
@@ -111,7 +111,6 @@ namespace LibrarySystem
             using (XmlWriter writer = XmlWriter.Create("books.xml"))
             {
                 writer.WriteStartDocument();
-                writer.WriteStartElement("books");
                 writer.WriteStartElement("book");
                 writer.WriteElementString("name", book.Name);
                 writer.WriteElementString("author", book.Authors[0]);
@@ -132,7 +131,6 @@ namespace LibrarySystem
             using (XmlWriter writer = XmlWriter.Create("newspapers.xml"))
             {
                 writer.WriteStartDocument();
-                writer.WriteStartElement("newspapers");
                 writer.WriteStartElement("newspaper");
                 writer.WriteElementString("name", newspapers.Name);
                 writer.WriteElementString("publicationPlace", newspapers.PublicationPlace);
@@ -140,7 +138,7 @@ namespace LibrarySystem
                 writer.WriteElementString("pageCount", newspapers.PageCount.ToString());
                 writer.WriteElementString("publicationYear", newspapers.PublicationYear.ToString());
                 writer.WriteElementString("pageCount", newspapers.PageCount.ToString());
-                writer.WriteElementString("notes", newspapers.Notes.ToString());
+                writer.WriteElementString("notes", newspapers.Notes);
                 writer.WriteElementString("date", newspapers.Date.ToString());
                 writer.WriteElementString("ISSN", newspapers.ISSN);
                 writer.WriteEndElement();
@@ -154,7 +152,6 @@ namespace LibrarySystem
             using (XmlWriter writer = XmlWriter.Create("books.xml"))
             {
                 writer.WriteStartDocument();
-                writer.WriteStartElement("patents");
                 writer.WriteStartElement("patent");
                 writer.WriteElementString("name", patent.Name);
                 writer.WriteElementString("inventor", patent.Inventors[0]);
@@ -169,26 +166,28 @@ namespace LibrarySystem
             }
         }
 
-        private void CheckValidation()
+        public void CheckValidation()
         {
-            XmlReaderSettings catalogSettings = new XmlReaderSettings();
-            catalogSettings.Schemas.Add("urn:schemas-microsoft-com:xml-msdata", "catalog.xsd");
+            var catalogSettings = new XmlReaderSettings();
+            catalogSettings.Schemas.Add("urn:schemas-microsoft-com:xml-msdata", @"C:\data\git_demo\demo\Module 7\LibrarySystem\catalog.xsd");
             catalogSettings.ValidationType = ValidationType.Schema;
-            catalogSettings.ValidationEventHandler += new ValidationEventHandler(CatalogSettingsValidationEventHandler);
-            XmlReader catalog = XmlReader.Create("books.xml", catalogSettings);
-            while (catalog.Read()) { }   
+            var catalog = XmlReader.Create(@"C:\data\git_demo\demo\Module 7\inputFile.xml", catalogSettings);
+            var document = new XmlDocument();
+            document.Load(catalog);
+            ValidationEventHandler eventHandler = CatalogSettingsValidationEventHandler;
+            document.Validate(eventHandler);
         }
 
         static void CatalogSettingsValidationEventHandler(object sender, ValidationEventArgs e)
         {
             if (e.Severity == XmlSeverityType.Warning)
             {
-                Console.Write("WARNING: ");
+                Console.Write("Warning: ");
                 Console.WriteLine(e.Message);
             }
             else if (e.Severity == XmlSeverityType.Error)
             {
-                Console.Write("ERROR: ");
+                Console.Write("Error: ");
                 Console.WriteLine(e.Message);
             }
         }

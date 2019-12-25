@@ -1,42 +1,40 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LibrarySystem
 {
-    public class Newspaper
+    public class Book: ICatalogEntity
     {
         public string Name { get; set; }
+        public List<string> Authors { get; set; }
         public string PublicationPlace { get; set; }
         public string Publisher { get; set; }
         public int PublicationYear { get; set; }
         public int PageCount { get; set; }
         public string Notes { get; set; }
-        public int Number { get; set; }
-        public DateTime Date { get; set; }
-        public string ISSN { get; set; }
+        public string ISBN { get; set; }
 
-        public Newspaper(string name, string publicationPlace, string publisher, int publicationYear, int pageCount, string notes, int number, DateTime date, string issn)
+        public Book(string name, List<string> authors, string publicationPlace, string publisher, int publicationYear, int pageCount, string notes, string isbn)
         {
-            if (string.IsNullOrWhiteSpace(issn))
+            if (string.IsNullOrWhiteSpace(isbn))
             {
                 throw new ArgumentOutOfRangeException();
             }
 
             Name = name;
+            foreach (var author in authors)
+            {
+                Authors.Add(author);
+            }
             PublicationPlace = publicationPlace;
             Publisher = publisher;
             PublicationYear = publicationYear;
             PageCount = pageCount;
             Notes = notes;
-            Number = number;
-            Date = date;
-            ISSN = issn;
+            ISBN = isbn;
         }
 
-        public Newspaper()
+        public Book()
         { }
-    }
+    }    
 }

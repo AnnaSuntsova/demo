@@ -1,170 +1,83 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
 using System.Xml;
+using System.Xml.Linq;
 using System.Xml.Schema;
 
 namespace LibrarySystem
 {
-    public class Actions
+    class Actions
     {
-        private List<Book> books = new List<Book>();
-        private List<Newspaper> newspapers = new List<Newspaper>();
-        private List<Patent> patents = new List<Patent>();
+        private string _nameOfElement = "catalog";
 
-        public void ReadBooks ()
+        public IEnumerable<ICatalogEntity> Read (TextReader input)
         {
-            var reader = XmlReader.Create("library.xml");
-            reader.ReadToFollowing("books");
-            while (reader.ReadToNextSibling("book"))
+            XmlReader xmlReader = XmlReader.Create(input);
+            xmlReader.ReadToFollowing(_nameOfElement);
+            xmlReader.ReadStartElement();
+            do
             {
-                reader.ReadToDescendant("name");
-                var name = reader.ReadElementContentAsString();
-                var authors = new List<string>();
-                while (reader.ReadToNextSibling("authors"))
+                while (xmlReader.NodeType == XmlNodeType.Element)
                 {
-                    reader.ReadToDescendant("author");
-                    authors.Add(reader.ReadElementContentAsString());
+                    var node = XNode.ReadFrom(xmlReader) as XElement;
+
+                    if (node.Name.LocalName == "Book")
+                    {
+                        BookParser parser = new BookParser();
+                        yield return parser.ReadBooks();
+                    }
+                    else if (node.Name.LocalName == "Newspaper")
+                    {
+                        NewspaperParser parser = new NewspaperParser();
+                        yield return parser.ReadNewspapers();
+                    }
+                    else if(node.Name.LocalName == "Patent")
+                    {
+                        PatentParser parser = new PatentParser();
+                        yield return parser.ReadPatents();
+                    }
+                    else
+                    {
+                        throw new ArgumentOutOfRangeException();
+                    }
                 }
-                reader.ReadToDescendant("publicationPlace");
-                var publicationPlace = reader.ReadElementContentAsString();
-                reader.ReadToDescendant("publisher");
-                var publisher = reader.ReadElementContentAsString();
-                reader.ReadToDescendant("publicationYear");
-                var publicationYear = reader.ReadElementContentAsInt();
-                reader.ReadToDescendant("pageCount");
-                var pageCount = reader.ReadElementContentAsInt();
-                reader.ReadToDescendant("notes");
-                var notes = reader.ReadElementContentAsString();
-                reader.ReadToDescendant("ISBN");
-                var isbn = reader.ReadElementContentAsString();
-                var book = new Book(name, authors, publicationPlace, publisher, publicationYear, pageCount, notes, isbn);
-                books.Add(book);
-            }
+            } while (xmlReader.Read());
         }
 
-        public void ReadNewspapers()
+        public void WriteTo(TextWriter output, IEnumerable<ICatalogEntity> catalogEntities)
         {
-            var reader = XmlReader.Create("library.xml");
-            reader.ReadToFollowing("newspapers");
-            while (reader.ReadToNextSibling("newspaper"))
+            using (XmlWriter xmlWriter = XmlWriter.Create(output, new XmlWriterSettings()))
             {
-                reader.ReadToDescendant("name");
-                var name = reader.ReadElementContentAsString();
-                reader.ReadToDescendant("publicationPlace");
-                var publicationPlace = reader.ReadElementContentAsString();
-                reader.ReadToDescendant("publisher");
-                var publisher = reader.ReadElementContentAsString();
-                reader.ReadToDescendant("publicationYear");
-                var publicationYear = reader.ReadElementContentAsInt();
-                reader.ReadToDescendant("pageCount");
-                var pageCount = reader.ReadElementContentAsInt();
-                reader.ReadToDescendant("notes");
-                var notes = reader.ReadElementContentAsString();
-                reader.ReadToDescendant("number");
-                var number = reader.ReadElementContentAsInt();
-                reader.ReadToDescendant("date");
-                var date = reader.ReadElementContentAsDateTime();
-                reader.ReadToDescendant("ISSN");
-                var issn = reader.ReadElementContentAsString();
-                var newspaper = new Newspaper(name, publicationPlace, publisher, publicationYear, pageCount, notes, number, date, issn);
-                newspapers.Add(newspaper);
-            }
-        }
-
-        public void ReadPatents()
-        {
-            var reader = XmlReader.Create("library.xml");
-            reader.ReadToFollowing("newspapers");
-            while (reader.ReadToNextSibling("newspaper"))
-            {
-                reader.ReadToDescendant("Name");
-                var name = reader.ReadElementContentAsString();
-                var inventors = new List<string>();
-                while (reader.ReadToNextSibling("inventors"))
+                xmlWriter.WriteStartDocument();
+                xmlWriter.WriteStartElement(_nameOfElement);
+                foreach (var catalogEntity in catalogEntities)
                 {
-                    reader.ReadToDescendant("inventors");
-                    inventors.Add(reader.ReadElementContentAsString());
+                    if (catalogEntity.GetType().Equals(typeof(Book)))
+                    {
+                        var bookWriter = new BookWriter();
+                        bookWriter.WriteBooks((Book)catalogEntity, xmlWriter);
+                    }
+                    else 
+                    if (catalogEntity.GetType().Equals(typeof(Newspaper)))
+                    {
+                        var newspaperWriter = new NewspaperWriter();
+                        newspaperWriter.WriteNewspapers((Newspaper)catalogEntity, xmlWriter);
+                    }
+                    else
+                    if (catalogEntity.GetType().Equals(typeof(Patent)))
+                    {
+                        var patentWriter = new PatentWriter();
+                        patentWriter.WritePatents((Patent)catalogEntity, xmlWriter);
+                    }
+                    else
+                    {
+                        throw new ArgumentOutOfRangeException();
+                    }
                 }
-                reader.ReadToDescendant("city");
-                var city = reader.ReadElementContentAsString();
-                reader.ReadToDescendant("registrationNumber");
-                var registrationNumber = reader.ReadElementContentAsInt();
-                reader.ReadToDescendant("applicationDate");
-                var applicationDate = reader.ReadElementContentAsDateTime();
-                reader.ReadToDescendant("publicationDate");
-                var publicationDate = reader.ReadElementContentAsDateTime();
-                reader.ReadToDescendant("pageCount");
-                var pageCount = reader.ReadElementContentAsInt();
-                reader.ReadToDescendant("notes");
-                var notes = reader.ReadElementContentAsString();
-                var patent = new Patent(name, inventors, city, registrationNumber, applicationDate, publicationDate, pageCount, notes);
-                patents.Add(patent);
+                xmlWriter.WriteEndElement();
             }
-        }
-
-        public void WriteBooks ()
-        {
-            var book = new Book();
-            using (XmlWriter writer = XmlWriter.Create("books.xml"))
-            {
-                writer.WriteStartDocument();
-                writer.WriteStartElement("book");
-                writer.WriteElementString("name", book.Name);
-                writer.WriteElementString("author", book.Authors[0]);
-                writer.WriteElementString("publicationPlace", book.PublicationPlace);
-                writer.WriteElementString("publisher", book.Publisher);
-                writer.WriteElementString("publicationYear", book.PublicationYear.ToString());
-                writer.WriteElementString("pageCount", book.PageCount.ToString());
-                writer.WriteElementString("notes", book.Notes);
-                writer.WriteElementString("ISBN", book.ISBN);
-                writer.WriteEndElement();
-                writer.WriteEndDocument();
-            }
-        }
-
-        public void WriteNewspapers()
-        {
-            var newspapers = new Newspaper();
-            using (XmlWriter writer = XmlWriter.Create("newspapers.xml"))
-            {
-                writer.WriteStartDocument();
-                writer.WriteStartElement("newspaper");
-                writer.WriteElementString("name", newspapers.Name);
-                writer.WriteElementString("publicationPlace", newspapers.PublicationPlace);
-                writer.WriteElementString("publisher", newspapers.Publisher);
-                writer.WriteElementString("pageCount", newspapers.PageCount.ToString());
-                writer.WriteElementString("publicationYear", newspapers.PublicationYear.ToString());
-                writer.WriteElementString("pageCount", newspapers.PageCount.ToString());
-                writer.WriteElementString("notes", newspapers.Notes);
-                writer.WriteElementString("date", newspapers.Date.ToString());
-                writer.WriteElementString("ISSN", newspapers.ISSN);
-                writer.WriteEndElement();
-                writer.WriteEndDocument();
-            }
-        }
-
-        public void WritePatents()
-        {
-            var patent = new Patent();
-            using (XmlWriter writer = XmlWriter.Create("books.xml"))
-            {
-                writer.WriteStartDocument();
-                writer.WriteStartElement("patent");
-                writer.WriteElementString("name", patent.Name);
-                writer.WriteElementString("inventor", patent.Inventors[0]);
-                writer.WriteElementString("city", patent.City);
-                writer.WriteElementString("registrationNumber", patent.RegistrationNumber.ToString());
-                writer.WriteElementString("applicationDate", patent.ApplicationDate.ToString());
-                writer.WriteElementString("publicationDate", patent.PublicationDate.ToString());
-                writer.WriteElementString("pageCount", patent.PageCount.ToString());
-                writer.WriteElementString("notes", patent.Notes);
-                writer.WriteEndElement();
-                writer.WriteEndDocument();
-            }
-        }
+        }       
 
         public void CheckValidation()
         {

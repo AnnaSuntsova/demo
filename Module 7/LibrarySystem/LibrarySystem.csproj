@@ -42,9 +42,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Actions.cs" />
-    <Compile Include="Newspaper.cs" />
-    <Compile Include="Book.cs" />
-    <Compile Include="Patent.cs" />
+    <Compile Include="Parsers\BookParser.cs" />
+    <Compile Include="Writers\BookWriter.cs" />
+    <Compile Include="ICatalogEntity.cs" />
+    <Compile Include="Entities\Newspaper.cs" />
+    <Compile Include="Entities\Book.cs" />
+    <Compile Include="Parsers\NewspaperParser.cs" />
+    <Compile Include="Writers\NewspaperWriter.cs" />
+    <Compile Include="Entities\Patent.cs" />
+    <Compile Include="Parsers\PatentParser.cs" />
+    <Compile Include="Writers\PatentWriter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

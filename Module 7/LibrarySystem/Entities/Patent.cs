@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LibrarySystem
 {
-    public class Patent
+    public class Patent: ICatalogEntity
     {
         public string Name { get; set; }
         public List<string> Inventors { get; set; }

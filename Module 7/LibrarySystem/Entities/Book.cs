@@ -22,6 +22,7 @@ namespace LibrarySystem
             }
 
             Name = name;
+            Authors = new List<string>();
             foreach (var author in authors)
             {
                 Authors.Add(author);

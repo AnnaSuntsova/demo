@@ -22,6 +22,7 @@ namespace LibrarySystem
             }
 
             Name = name;
+            Inventors = new List<string>();
             foreach (var inventor in inventors)
             {
                 Inventors.Add(inventor);

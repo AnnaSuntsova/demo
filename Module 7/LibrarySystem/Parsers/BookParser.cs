@@ -10,35 +10,54 @@ namespace LibrarySystem
 {
     class BookParser
     {      
-        public ICatalogEntity ReadBooks()
+        public ICatalogEntity ReadBooks(XmlReader reader)
         {
-            const string nameOfFile = "outputXML.xml";
-            var reader = XmlReader.Create(nameOfFile);
-            reader.ReadToFollowing("books");
-            
-            reader.ReadToDescendant("name");
-            var name = reader.ReadElementContentAsString();
-            var authors = new List<string>();
-            while (reader.ReadToNextSibling("authors"))
+            if (reader.Name != "name")
             {
-                reader.ReadToDescendant("author");
+                reader.ReadToFollowing("name");
+            }
+            var name = reader.ReadElementContentAsString();
+            if (reader.Name != "author")
+            {
+                reader.ReadToFollowing("author");
+            }
+            var authors = new List<string>();
+            while (reader.Name=="author")
+            {
                 authors.Add(reader.ReadElementContentAsString());
             }
-            reader.ReadToDescendant("publicationPlace");
+            if (reader.Name != "publicationPlace")
+            {
+                reader.ReadToFollowing("publicationPlace");
+            }
             var publicationPlace = reader.ReadElementContentAsString();
-            reader.ReadToDescendant("publisher");
+            if (reader.Name != "publisher")
+            {
+                reader.ReadToFollowing("publisher");
+            }
             var publisher = reader.ReadElementContentAsString();
-            reader.ReadToDescendant("publicationYear");
+            if (reader.Name != "publicationYear")
+            {
+                reader.ReadToFollowing("publicationYear");
+            }
             var publicationYear = reader.ReadElementContentAsInt();
-            reader.ReadToDescendant("pageCount");
+            if (reader.Name != "pageCount")
+            {
+                reader.ReadToFollowing("pageCount");
+            }
             var pageCount = reader.ReadElementContentAsInt();
-            reader.ReadToDescendant("notes");
+            if (reader.Name != "notes")
+            {
+                reader.ReadToFollowing("notes");
+            }
             var notes = reader.ReadElementContentAsString();
-            reader.ReadToDescendant("ISBN");
+            if (reader.Name != "ISBN")
+            {
+                reader.ReadToFollowing("ISBN");
+            }
             var isbn = reader.ReadElementContentAsString();
             var book = new Book(name, authors, publicationPlace, publisher, publicationYear, pageCount, notes, isbn);
-
-            return book;
+            return book;               
         }
     }
 }

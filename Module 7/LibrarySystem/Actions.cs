@@ -7,42 +7,43 @@ using System.Xml.Schema;
 
 namespace LibrarySystem
 {
-    class Actions
+    public class Actions
     {
         private string _nameOfElement = "catalog";
 
         public IEnumerable<ICatalogEntity> Read (TextReader input)
         {
-            XmlReader xmlReader = XmlReader.Create(input);
-            xmlReader.ReadToFollowing(_nameOfElement);
-            xmlReader.ReadStartElement();
-            do
-            {
-                while (xmlReader.NodeType == XmlNodeType.Element)
+           XmlReader xmlReader = XmlReader.Create(input);
+           {
+                xmlReader.MoveToContent();
+                //xmlReader.ReadToFollowing(_nameOfElement);
+                //xmlReader.ReadStartElement();
+                //do
+                while (xmlReader.Read())
                 {
-                    var node = XNode.ReadFrom(xmlReader) as XElement;
+                    if (xmlReader.NodeType == XmlNodeType.Element)
+                    {                   
 
-                    if (node.Name.LocalName == "Book")
-                    {
-                        BookParser parser = new BookParser();
-                        yield return parser.ReadBooks();
-                    }
-                    else if (node.Name.LocalName == "Newspaper")
-                    {
-                        NewspaperParser parser = new NewspaperParser();
-                        yield return parser.ReadNewspapers();
-                    }
-                    else if(node.Name.LocalName == "Patent")
-                    {
-                        PatentParser parser = new PatentParser();
-                        yield return parser.ReadPatents();
-                    }
-                    else
-                    {
-                        throw new ArgumentOutOfRangeException();
+                        if (xmlReader.Name == "book")
+                        {
+                            //var node = XElement.ReadFrom(xmlReader) as XElement;
+                            BookParser parser = new BookParser();
+                            yield return parser.ReadBooks(xmlReader);
+                        }
+                        else if (xmlReader.Name == "newspaper")
+                        {
+                            NewspaperParser parser = new NewspaperParser();
+                            yield return parser.ReadNewspapers(xmlReader);
+                        }
+                        else if (xmlReader.Name == "patent")
+                        {
+                            PatentParser parser = new PatentParser();
+                            yield return parser.ReadPatents(xmlReader);
+                        }
                     }
                 }
-            } while (xmlReader.Read());
+                //} while (xmlReader.Read());
+            }
         }
 
         public void WriteTo(TextWriter output, IEnumerable<ICatalogEntity> catalogEntities)

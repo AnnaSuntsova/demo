@@ -5,33 +5,52 @@ namespace LibrarySystem
 {
     class PatentParser
     {
-        public ICatalogEntity ReadPatents()
+        public ICatalogEntity ReadPatents(XmlReader reader)
         {
-            const string nameOfFile = "outputXML.xml";
-            var reader = XmlReader.Create(nameOfFile);
-            reader.ReadToFollowing("patent");
-
-            reader.ReadToDescendant("Name");
-            var name = reader.ReadElementContentAsString();
-            var inventors = new List<string>();
-            while (reader.ReadToNextSibling("inventors"))
+            if (reader.Name != "name")
             {
-                reader.ReadToDescendant("inventors");
+                reader.ReadToFollowing("name");
+            }
+            var name = reader.ReadElementContentAsString();
+            if (reader.Name != "inventor")
+            {
+                reader.ReadToFollowing("inventor");
+            }
+            var inventors = new List<string>();
+            while (reader.Name == "inventor")
+            {
                 inventors.Add(reader.ReadElementContentAsString());
             }
-            reader.ReadToDescendant("city");
+            if (reader.Name != "city")
+            {
+                reader.ReadToFollowing("city");
+            }
             var city = reader.ReadElementContentAsString();
-            reader.ReadToDescendant("registrationNumber");
+            if (reader.Name != "registrationNumber")
+            {
+                reader.ReadToFollowing("registrationNumber");
+            }
             var registrationNumber = reader.ReadElementContentAsInt();
-            reader.ReadToDescendant("applicationDate");
+            if (reader.Name != "applicationDate")
+            {
+                reader.ReadToFollowing("applicationDate");
+            }
             var applicationDate = reader.ReadElementContentAsDateTime();
-            reader.ReadToDescendant("publicationDate");
+            if (reader.Name != "publicationDate")
+            {
+                reader.ReadToFollowing("publicationDate");
+            }
             var publicationDate = reader.ReadElementContentAsDateTime();
-            reader.ReadToDescendant("pageCount");
+            if (reader.Name != "pageCount")
+            {
+                reader.ReadToFollowing("pageCount");
+            }
             var pageCount = reader.ReadElementContentAsInt();
-            reader.ReadToDescendant("notes");
+            if (reader.Name != "notes")
+            {
+                reader.ReadToFollowing("notes");
+            }
             var notes = reader.ReadElementContentAsString();
-
             var patent = new Patent(name, inventors, city, registrationNumber, applicationDate, publicationDate, pageCount, notes);
             return patent;
         }

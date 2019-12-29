@@ -4,31 +4,55 @@ namespace LibrarySystem
 {
     class NewspaperParser
     {
-        public ICatalogEntity ReadNewspapers()
+        public ICatalogEntity ReadNewspapers(XmlReader reader)
         {
-            const string nameOfFile = "outputXML.xml";
-            var reader = XmlReader.Create(nameOfFile);
-            reader.ReadToDescendant("name");
+            if (reader.Name != "name")
+            {
+                reader.ReadToFollowing("name");
+            }
             var name = reader.ReadElementContentAsString();
-            reader.ReadToDescendant("publicationPlace");
+            if (reader.Name != "publicationPlace")
+            {
+                reader.ReadToFollowing("publicationPlace");
+            }
             var publicationPlace = reader.ReadElementContentAsString();
-            reader.ReadToDescendant("publisher");
+            if (reader.Name != "publisher")
+            {
+                reader.ReadToFollowing("publisher");
+            }
             var publisher = reader.ReadElementContentAsString();
-            reader.ReadToDescendant("publicationYear");
+            if (reader.Name != "publicationYear")
+            {
+                reader.ReadToFollowing("publicationYear");
+            }
             var publicationYear = reader.ReadElementContentAsInt();
-            reader.ReadToDescendant("pageCount");
+            if (reader.Name != "pageCount")
+            {
+                reader.ReadToFollowing("pageCount");
+            }
             var pageCount = reader.ReadElementContentAsInt();
-            reader.ReadToDescendant("notes");
+            if (reader.Name != "notes")
+            {
+                reader.ReadToFollowing("notes");
+            }
             var notes = reader.ReadElementContentAsString();
-            reader.ReadToDescendant("number");
+            if (reader.Name != "number")
+            {
+                reader.ReadToFollowing("number");
+            }
             var number = reader.ReadElementContentAsInt();
-            reader.ReadToDescendant("date");
+            if (reader.Name != "date")
+            {
+                reader.ReadToFollowing("date");
+            }
             var date = reader.ReadElementContentAsDateTime();
-            reader.ReadToDescendant("ISSN");
+            if (reader.Name != "ISSN")
+            {
+                reader.ReadToFollowing("ISSN");
+            }
             var issn = reader.ReadElementContentAsString();
             var newspaper = new Newspaper(name, publicationPlace, publisher, publicationYear, pageCount, notes, number, date, issn);
             return newspaper;
         }
-
     }
 }

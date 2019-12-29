@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace LibrarySystem
 {
-    interface ICatalogEntity
+    public interface ICatalogEntity
     {
     }
 }

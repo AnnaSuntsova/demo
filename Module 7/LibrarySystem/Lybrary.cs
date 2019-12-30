@@ -2,23 +2,21 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Xml;
-using System.Xml.Linq;
 using System.Xml.Schema;
 
 namespace LibrarySystem
 {
-    public class Actions
+    public class Lybrary
     {
         private string _nameOfElement = "catalog";
+        public event EventHandler OnWarning;
+        public event EventHandler OnError;
 
         public IEnumerable<ICatalogEntity> Read (TextReader input)
         {
            XmlReader xmlReader = XmlReader.Create(input);
            {
                 xmlReader.MoveToContent();
-                //xmlReader.ReadToFollowing(_nameOfElement);
-                //xmlReader.ReadStartElement();
-                //do
                 while (xmlReader.Read())
                 {
                     if (xmlReader.NodeType == XmlNodeType.Element)
@@ -26,7 +24,6 @@ namespace LibrarySystem
 
                         if (xmlReader.Name == "book")
                         {
-                            //var node = XElement.ReadFrom(xmlReader) as XElement;
                             BookParser parser = new BookParser();
                             yield return parser.ReadBooks(xmlReader);
                         }
@@ -42,7 +39,6 @@ namespace LibrarySystem
                         }
                     }
                 }
-                //} while (xmlReader.Read());
             }
         }
 
@@ -80,29 +76,27 @@ namespace LibrarySystem
             }
         }       
 
-        public void CheckValidation()
+        public void CheckValidation(XmlReader catalog)
         {
             var catalogSettings = new XmlReaderSettings();
-            catalogSettings.Schemas.Add("urn:schemas-microsoft-com:xml-msdata", @"C:\data\git_demo\demo\Module 7\LibrarySystem\catalog.xsd");
+            var pathToXsd = Path.Combine(Environment.CurrentDirectory, "catalog.xsd");
+            catalogSettings.Schemas.Add("urn:schemas-microsoft-com:xml-msdata", pathToXsd);
             catalogSettings.ValidationType = ValidationType.Schema;
-            var catalog = XmlReader.Create(@"C:\data\git_demo\demo\Module 7\inputFile.xml", catalogSettings);
             var document = new XmlDocument();
             document.Load(catalog);
             ValidationEventHandler eventHandler = CatalogSettingsValidationEventHandler;
             document.Validate(eventHandler);
         }
 
-        static void CatalogSettingsValidationEventHandler(object sender, ValidationEventArgs e)
+        private void CatalogSettingsValidationEventHandler(object sender, ValidationEventArgs e)
         {
             if (e.Severity == XmlSeverityType.Warning)
             {
-                Console.Write("Warning: ");
-                Console.WriteLine(e.Message);
+                OnWarning?.Invoke(this, null);
             }
             else if (e.Severity == XmlSeverityType.Error)
             {
-                Console.Write("Error: ");
-                Console.WriteLine(e.Message);
+                OnError?.Invoke(this, null);
             }
         }
     }

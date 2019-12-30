@@ -5,17 +5,18 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using LibrarySystem.Entities;
 
 namespace Tests
 {
     public class TestsForLibrary
     {
-        private Actions _catalog;
+        private Lybrary _catalog;
 
         [Test]
         public void TestBooksRead()
         {
-            _catalog = new Actions();
+            _catalog = new Lybrary();
             TextReader sr = new StringReader(@"<?xml version=""1.0"" encoding=""utf-16""?>" +
                                             "<catalog>" +
                                                 "<book>"+
@@ -46,7 +47,7 @@ namespace Tests
         [Test]
         public void TestNewspaperRead()
         {
-            _catalog = new Actions();
+            _catalog = new Lybrary();
             TextReader sr = new StringReader(@"<?xml version=""1.0"" encoding=""utf-16""?>" +
                                             "<catalog>" +
                                                 "<newspaper>" +
@@ -57,7 +58,11 @@ namespace Tests
                                                     @"<pageCount>28</pageCount>" +
                                                     @"<notes>Notes for newspaper</notes>" +
                                                     @"<number>49</number>" +
-                                                    @"<date>2019-12-15</date>" +
+                                                    @"<date>" +
+                                                        @"<day>15</day>" +
+                                                        @"<month>12</month>" +
+                                                        @"<year>2019</year>" +
+                                                    @"</date>" +
                                                     @"<ISSN>0140-0460</ISSN>" +
                                                 "</newspaper>" +
                                             "</catalog>");
@@ -76,19 +81,27 @@ namespace Tests
         [Test]
         public void TestPatentsRead()
         {
-            _catalog = new Actions();
+            _catalog = new Lybrary();
             TextReader sr = new StringReader(@"<?xml version=""1.0"" encoding=""utf-16""?>" +
                                             "<catalog>" +
                                                 "<patent>" +
                                                     @"<name>MIDDLE BREAKER FOR A TILLAGE IMPLEMENT</name>" +
                                                     @"<inventors>" +
-                                                    @"<inventor>Shawn J. BECKER</inventor>" +
-                                                    @"<inventor>David L. STEINLAGE</inventor>" +
+                                                        @"<inventor>Shawn J. BECKER</inventor>" +
+                                                        @"<inventor>David L. STEINLAGE</inventor>" +
                                                     @"</inventors>" +
                                                     @"<city>London</city>" +
                                                     @"<registrationNumber>16009291</registrationNumber>" +
                                                     @"<applicationDate>2018-06-15</applicationDate>" +
-                                                    @"<publicationDate>2019-12-19</publicationDate>" +
+                                                        @"<day>15</day>" +
+                                                        @"<month>06</month>" +
+                                                        @"<year>2018</year>" +
+                                                    @"</applicationDate>" +
+                                                    @"<publicationDate>" +
+                                                        @"<day>19</day>" +
+                                                        @"<month>12</month>" +
+                                                        @"<year>2019</year>" +
+                                                    @"</publicationDate>" +
                                                     @"<pageCount>12</pageCount>" +
                                                     @"<notes>A tillage implement having a frame member extending in a fore-aft direction of the implement, the frame member pivotally connected in a foldable configuration, the frame member comprising a main frame section.</notes>" +
                                                     @"<ISBN>9781509853311</ISBN>" +
@@ -109,7 +122,7 @@ namespace Tests
         [Test]
         public void TestAllWrite()
         {
-            _catalog = new Actions();
+            _catalog = new Lybrary();
             var book = CreateBook();
             var newspaper = CreateNewspaper();
             var patent = CreatePatent();
@@ -147,7 +160,11 @@ namespace Tests
                                                     @"<publicationYear>2019</publicationYear>" +                                                    
                                                     @"<notes>Notes for newspaper</notes>" +
                                                     @"<number>49</number>" +
-                                                    @"<date>2019-12-15</date>" +
+                                                    @"<date>" +
+                                                        @"<day>15</day>" +
+                                                        @"<month>12</month>" +
+                                                        @"<year>2019</year>" +
+                                                    @"</date>" +
                                                     @"<ISSN>0140-0460</ISSN>" +
                                                 "</newspaper>" +
                                                 "<patent>" +
@@ -159,7 +176,15 @@ namespace Tests
                                                     @"<city>London</city>" +
                                                     @"<registrationNumber>16009291</registrationNumber>" +
                                                     @"<applicationDate>2018-06-15</applicationDate>" +
-                                                    @"<publicationDate>2019-12-19</publicationDate>" +
+                                                        @"<day>15</day>" +
+                                                        @"<month>06</month>" +
+                                                        @"<year>2018</year>" +
+                                                    @"</applicationDate>" +
+                                                    @"<publicationDate>" +
+                                                        @"<day>19</day>" +
+                                                        @"<month>12</month>" +
+                                                        @"<year>2019</year>" +
+                                                    @"</publicationDate>" +
                                                     @"<pageCount>12</pageCount>" +
                                                     @"<notes>A tillage implement having a frame member extending in a fore-aft direction of the implement, the frame member pivotally connected in a foldable configuration, the frame member comprising a main frame section.</notes>" +
                                                   "</patent>" +
@@ -200,7 +225,9 @@ namespace Tests
                        x.PageCount == y.PageCount &&
                        x.Notes == y.Notes &&
                        x.Number == y.Number &&
-                       x.Date == y.Date &&
+                       x.Date.Day == y.Date.Day &&
+                       x.Date.Month == y.Date.Month &&
+                       x.Date.Year == y.Date.Year &&
                        x.ISSN == y.ISSN ? 0 : 1;
             }
             public int Compare(object x, object y)
@@ -258,7 +285,12 @@ namespace Tests
                 PageCount = 28,
                 Notes = "Notes for newspaper",
                 Number = 49,
-                Date = DateTime.Parse("15/12/2019"),
+                Date = new Date
+                {
+                    Day = 15,
+                    Month = 12,
+                    Year = 2019
+                },
                 ISSN = "0140-0460"
             };
             return newspaper;

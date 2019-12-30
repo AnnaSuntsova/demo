@@ -6,6 +6,10 @@ namespace LibrarySystem
     {
         public ICatalogEntity ReadNewspapers(XmlReader reader)
         {
+            int day, month, year;
+            day = 0;
+            month = 0;
+            year = 0;
             if (reader.Name != "name")
             {
                 reader.ReadToFollowing("name");
@@ -45,13 +49,28 @@ namespace LibrarySystem
             {
                 reader.ReadToFollowing("date");
             }
-            var date = reader.ReadElementContentAsDateTime();
+            if (reader.Name != "day")
+            {
+                reader.ReadToFollowing("day");
+                day = reader.ReadElementContentAsInt();
+            }
+            if (reader.Name != "month")
+            {
+                reader.ReadToFollowing("month");                    
+            }
+            month = reader.ReadElementContentAsInt();
+            if (reader.Name != "year")
+            {
+                reader.ReadToFollowing("year");
+            }
+            year = reader.ReadElementContentAsInt();    
+            //var date = reader.ReadElementContentAsDateTime();
             if (reader.Name != "ISSN")
             {
                 reader.ReadToFollowing("ISSN");
             }
             var issn = reader.ReadElementContentAsString();
-            var newspaper = new Newspaper(name, publicationPlace, publisher, publicationYear, pageCount, notes, number, date, issn);
+            var newspaper = new Newspaper(name, publicationPlace, publisher, publicationYear, pageCount, notes, number, year, month, day, issn);
             return newspaper;
         }
     }

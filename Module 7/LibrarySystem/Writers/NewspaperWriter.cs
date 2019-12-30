@@ -38,10 +38,12 @@ namespace LibrarySystem
             {
                 writer.WriteElementString("number", newspaper.Number.ToString());
             }
-            if (newspaper.Date!=DateTime.MinValue)
-            {
-                writer.WriteElementString("date", newspaper.Date.ToString("yyyy-MM-dd"));
-            }
+            writer.WriteStartElement("date");
+            writer.WriteElementString("day", newspaper.Date.Day.ToString());
+            writer.WriteElementString("month", newspaper.Date.Month.ToString());
+            writer.WriteElementString("year", newspaper.Date.Year.ToString());
+            writer.WriteEndElement();
+
             if (!string.IsNullOrWhiteSpace(newspaper.ISSN))
             {
                 writer.WriteElementString("ISSN", newspaper.ISSN);

@@ -14,7 +14,7 @@ namespace LibrarySystem
         public int PageCount { get; set; }
         public string Notes { get; set; }
 
-        public Patent(string name, List <string> inventors, string city, int registrationNumber, DateTime applicationDate, DateTime publicationDate, int pageCount, string notes)
+        public Patent(string name, List <string> inventors, string city, int registrationNumber, int dayApp, int monthApp, int yearApp, int dayPub, int monthPub, int yearPub, int pageCount, string notes)
         {
             if (string.IsNullOrWhiteSpace(name)||(registrationNumber == 0))
             {
@@ -29,11 +29,25 @@ namespace LibrarySystem
             }
             City = city;
             RegistrationNumber = registrationNumber;
-            ApplicationDate = applicationDate;
-            PublicationDate = publicationDate;
+            try
+            {
+                ApplicationDate = new DateTime(yearApp, monthApp, dayApp);
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                throw new ArgumentOutOfRangeException("ApplicationDate is out of range");
+            }
+            try
+            {
+                PublicationDate = new DateTime(yearPub, monthPub, dayPub);
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                throw new ArgumentOutOfRangeException("PublicationDate is out of range");
+            }
             PageCount = pageCount;
             Notes = notes;
-        }
+            }
 
         public Patent ()
         { }

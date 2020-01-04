@@ -1,58 +1,46 @@
-﻿using System.Collections.Generic;
-using System.Xml;
+﻿using System;
+using System.Linq;
+using System.Xml.Linq;
 
 namespace LibrarySystem
 {
     class PatentParser
     {
-        public ICatalogEntity ReadPatents(XmlReader reader)
+        public void ReadPatents(string reader)
         {
-            if (reader.Name != "name")
+            var patent = new Patent();
+            var xDoc = XElement.Parse(reader);
+
+            foreach (var item in xDoc.Elements("patents"))
             {
-                reader.ReadToFollowing("name");
+                var xNode = XElement.Parse(item.ToString());
+                foreach (var node in xNode.Elements("patent"))
+                {
+                    try
+                    {
+                        Library.libraryPatents.Add(
+                        patent = new Patent
+                        {
+                            Name = node.Elements("name").FirstOrDefault()?.Value,
+                            Inventors = node.Elements("inventors").Descendants()?.Select(x => x.Value.ToString()).ToList(),
+                            City = node.Elements("city").FirstOrDefault()?.Value,
+                            PageCount = int.Parse(node.Elements("pageCount").FirstOrDefault()?.Value),
+                            Notes = node.Elements("notes").FirstOrDefault()?.Value,
+                            RegistrationNumber = int.Parse(node.Elements("registrationNumber").FirstOrDefault()?.Value),
+                            ApplicationDate = new DateTime(int.Parse(node.Elements("applicationDate").Descendants().Where(x => x.Name == "year").FirstOrDefault()?.Value),
+                                                     int.Parse(node.Elements("applicationDate").Descendants().Where(x => x.Name == "month").FirstOrDefault()?.Value),
+                                                     int.Parse(node.Elements("applicationDate").Descendants().Where(x => x.Name == "day").FirstOrDefault()?.Value)),
+                            PublicationDate = new DateTime(int.Parse(node.Elements("publicationDate").Descendants().Where(x => x.Name == "year").FirstOrDefault()?.Value),
+                                                     int.Parse(node.Elements("publicationDate").Descendants().Where(x => x.Name == "month").FirstOrDefault()?.Value),
+                                                     int.Parse(node.Elements("publicationDate").Descendants().Where(x => x.Name == "day").FirstOrDefault()?.Value)),
+                        });
+                    }
+                    catch (ArgumentOutOfRangeException)
+                    {
+                        throw new ArgumentOutOfRangeException();
+                    }
+                }
             }
-            var name = reader.ReadElementContentAsString();
-            if (reader.Name != "inventor")
-            {
-                reader.ReadToFollowing("inventor");
-            }
-            var inventors = new List<string>();
-            while (reader.Name == "inventor")
-            {
-                inventors.Add(reader.ReadElementContentAsString());
-            }
-            if (reader.Name != "city")
-            {
-                reader.ReadToFollowing("city");
-            }
-            var city = reader.ReadElementContentAsString();
-            if (reader.Name != "registrationNumber")
-            {
-                reader.ReadToFollowing("registrationNumber");
-            }
-            var registrationNumber = reader.ReadElementContentAsInt();
-            if (reader.Name != "applicationDate")
-            {
-                reader.ReadToFollowing("applicationDate");
-            }
-            var applicationDate = reader.ReadElementContentAsDateTime();
-            if (reader.Name != "publicationDate")
-            {
-                reader.ReadToFollowing("publicationDate");
-            }
-            var publicationDate = reader.ReadElementContentAsDateTime();
-            if (reader.Name != "pageCount")
-            {
-                reader.ReadToFollowing("pageCount");
-            }
-            var pageCount = reader.ReadElementContentAsInt();
-            if (reader.Name != "notes")
-            {
-                reader.ReadToFollowing("notes");
-            }
-            var notes = reader.ReadElementContentAsString();
-            var patent = new Patent(name, inventors, city, registrationNumber, applicationDate, publicationDate, pageCount, notes);
-            return patent;
         }
     }
 }

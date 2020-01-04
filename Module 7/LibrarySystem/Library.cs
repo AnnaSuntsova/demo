@@ -6,66 +6,69 @@ using System.Xml.Schema;
 
 namespace LibrarySystem
 {
-    public class Lybrary
+    public class Library
     {
         private string _nameOfElement = "catalog";
         public event EventHandler OnWarning;
         public event EventHandler OnError;
+        public static List<Book> libraryBooks = new List<Book>();
+        public static List<Newspaper> libraryNewspapers = new List<Newspaper>();
+        public static List<Patent> libraryPatents = new List<Patent>();
 
-        public IEnumerable<ICatalogEntity> Read (TextReader input)
+        public void Read (string input)
         {
-           XmlReader xmlReader = XmlReader.Create(input);
+           XmlReader xmlReader = XmlReader.Create(new StringReader (input));
            {
                 xmlReader.MoveToContent();
                 while (xmlReader.Read())
                 {
                     if (xmlReader.NodeType == XmlNodeType.Element)
-                    {                   
-
-                        if (xmlReader.Name == "book")
+                    {              
+                        if (xmlReader.Name == "books")
                         {
                             BookParser parser = new BookParser();
-                            yield return parser.ReadBooks(xmlReader);
+                            parser.ReadBooks(input);
                         }
-                        else if (xmlReader.Name == "newspaper")
+                        else if (xmlReader.Name == "newspapers")
                         {
                             NewspaperParser parser = new NewspaperParser();
-                            yield return parser.ReadNewspapers(xmlReader);
+                            parser.ReadNewspapers(input);
                         }
-                        else if (xmlReader.Name == "patent")
+                        else if (xmlReader.Name == "patents")
                         {
                             PatentParser parser = new PatentParser();
-                            yield return parser.ReadPatents(xmlReader);
+                            parser.ReadPatents(input);
                         }
                     }
                 }
             }
         }
 
-        public void WriteTo(TextWriter output, IEnumerable<ICatalogEntity> catalogEntities)
+        public TextWriter WriteTo(IEnumerable<ICatalogEntity>[] catalogEntities)
         {
+            TextWriter output = new StringWriter();
             using (XmlWriter xmlWriter = XmlWriter.Create(output, new XmlWriterSettings()))
             {
                 xmlWriter.WriteStartDocument();
                 xmlWriter.WriteStartElement(_nameOfElement);
                 foreach (var catalogEntity in catalogEntities)
-                {
-                    if (catalogEntity.GetType().Equals(typeof(Book)))
+                {                    
+                    if (catalogEntity.GetType().Equals(typeof(List<Book>)))
                     {
                         var bookWriter = new BookWriter();
-                        bookWriter.WriteBooks((Book)catalogEntity, xmlWriter);
-                    }
-                    else 
-                    if (catalogEntity.GetType().Equals(typeof(Newspaper)))
-                    {
-                        var newspaperWriter = new NewspaperWriter();
-                        newspaperWriter.WriteNewspapers((Newspaper)catalogEntity, xmlWriter);
+                        bookWriter.WriteBooks((IEnumerable<Book>) catalogEntity, xmlWriter);
                     }
                     else
-                    if (catalogEntity.GetType().Equals(typeof(Patent)))
+                    if (catalogEntity.GetType().Equals(typeof(List<Newspaper>)))
+                    {
+                        var newspaperWriter = new NewspaperWriter();
+                        newspaperWriter.WriteNewspapers((IEnumerable<Newspaper>)catalogEntity, xmlWriter);
+                    }
+                    else
+                    if (catalogEntity.GetType().Equals(typeof(List<Patent>)))
                     {
                         var patentWriter = new PatentWriter();
-                        patentWriter.WritePatents((Patent)catalogEntity, xmlWriter);
+                        patentWriter.WritePatents((IEnumerable<Patent>)catalogEntity, xmlWriter);
                     }
                     else
                     {
@@ -74,6 +77,7 @@ namespace LibrarySystem
                 }
                 xmlWriter.WriteEndElement();
             }
+            return output;
         }       
 
         public void CheckValidation(XmlReader catalog)

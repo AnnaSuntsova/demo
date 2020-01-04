@@ -1,63 +1,35 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
+﻿using System.Linq;
 using System.Xml.Linq;
+
 
 namespace LibrarySystem
 {
     class BookParser
     {      
-        public ICatalogEntity ReadBooks(XmlReader reader)
+        public void ReadBooks(string reader)
         {
-            if (reader.Name != "name")
+            var book = new Book();
+            var xDoc = XElement.Parse(reader);
+
+            foreach (var item in xDoc.Elements("books"))
             {
-                reader.ReadToFollowing("name");
+                var xNode = XElement.Parse(item.ToString());
+                foreach (var node in xNode.Elements("book"))
+                {
+                    Library.libraryBooks.Add(
+                    book = new Book
+                    {
+                        Name = node.Elements("name").FirstOrDefault()?.Value,
+                        Authors = node.Elements("authors").Descendants()?.Select(x => x.Value.ToString()).ToList(),
+                        Publisher = node.Elements("publisher").FirstOrDefault()?.Value,
+                        PublicationPlace = node.Elements("publicationPlace").FirstOrDefault()?.Value,
+                        PageCount = int.Parse(node.Elements("pageCount").FirstOrDefault()?.Value),
+                        PublicationYear = int.Parse(node.Elements("publicationYear").FirstOrDefault()?.Value),
+                        Notes = node.Elements("notes").FirstOrDefault()?.Value,
+                        ISBN = node.Elements("isbn").FirstOrDefault()?.Value,
+                    });
+                }
             }
-            var name = reader.ReadElementContentAsString();
-            if (reader.Name != "author")
-            {
-                reader.ReadToFollowing("author");
-            }
-            var authors = new List<string>();
-            while (reader.Name=="author")
-            {
-                authors.Add(reader.ReadElementContentAsString());
-            }
-            if (reader.Name != "publicationPlace")
-            {
-                reader.ReadToFollowing("publicationPlace");
-            }
-            var publicationPlace = reader.ReadElementContentAsString();
-            if (reader.Name != "publisher")
-            {
-                reader.ReadToFollowing("publisher");
-            }
-            var publisher = reader.ReadElementContentAsString();
-            if (reader.Name != "publicationYear")
-            {
-                reader.ReadToFollowing("publicationYear");
-            }
-            var publicationYear = reader.ReadElementContentAsInt();
-            if (reader.Name != "pageCount")
-            {
-                reader.ReadToFollowing("pageCount");
-            }
-            var pageCount = reader.ReadElementContentAsInt();
-            if (reader.Name != "notes")
-            {
-                reader.ReadToFollowing("notes");
-            }
-            var notes = reader.ReadElementContentAsString();
-            if (reader.Name != "ISBN")
-            {
-                reader.ReadToFollowing("ISBN");
-            }
-            var isbn = reader.ReadElementContentAsString();
-            var book = new Book(name, authors, publicationPlace, publisher, publicationYear, pageCount, notes, isbn);
-            return book;               
         }
     }
 }

@@ -41,8 +41,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Entities\Date.cs" />
-    <Compile Include="Lybrary.cs" />
+    <Compile Include="Library.cs" />
     <Compile Include="Parsers\BookParser.cs" />
     <Compile Include="Writers\BookWriter.cs" />
     <Compile Include="ICatalogEntity.cs" />

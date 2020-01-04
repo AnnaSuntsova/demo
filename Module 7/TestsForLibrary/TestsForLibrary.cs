@@ -3,143 +3,275 @@ using NUnit.Framework;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using LibrarySystem.Entities;
 
 namespace Tests
 {
     public class TestsForLibrary
     {
-        private Lybrary _catalog;
+        public Library _catalog;
+
+        [SetUp]
+        public void CreateInstances()
+        {
+            _catalog = new Library();
+            Library.libraryBooks = new List<Book>();
+            Library.libraryNewspapers = new List<Newspaper>();
+            Library.libraryPatents = new List<Patent>();
+        }
 
         [Test]
         public void TestBooksRead()
-        {
-            _catalog = new Lybrary();
-            TextReader sr = new StringReader(@"<?xml version=""1.0"" encoding=""utf-16""?>" +
+        {            
+            var sr =                       @"<?xml version=""1.0"" encoding=""utf-16""?>" +
                                             "<catalog>" +
-                                                "<book>"+
-                                                    @"<name>Me: Elton John Official Autobiography</name>" +
-                                                    @"<authors>" +
-                                                    @"<author>Elton John</author>" +
-                                                    @"</authors>" +
-                                                    @"<publicationPlace>London</publicationPlace>" +
-                                                    @"<publisher>Pan MacMillan</publisher>" +
-                                                    @"<publicationYear>2019</publicationYear>" +
-                                                    @"<pageCount>384</pageCount>" +
-                                                    @"<notes>Notes for book</notes>" +
-                                                    @"<ISBN>978-1-50985-331-1</ISBN>" +
-                                                "</book>" +
-                                            "</catalog>");
+                                                "<books>" +
+                                                    "<book>" +
+                                                        @"<name>Me: Elton John Official Autobiography</name>" +
+                                                        @"<authors>" +
+                                                            @"<author>Elton John</author>" +
+                                                        @"</authors>" +
+                                                        @"<publicationPlace>London</publicationPlace>" +
+                                                        @"<publisher>Pan MacMillan</publisher>" +
+                                                        @"<publicationYear>2019</publicationYear>" +
+                                                        @"<pageCount>384</pageCount>" +
+                                                        @"<notes>Notes for book</notes>" +
+                                                        @"<isbn>978-1-50985-331-1</isbn>" +
+                                                    "</book>" +
+                                                     "<book>" +
+                                                        @"<name>Me: Elton John Official Autobiography</name>" +
+                                                        @"<authors>" +
+                                                            @"<author>Elton John</author>" +
+                                                        @"</authors>" +
+                                                        @"<publicationPlace>London</publicationPlace>" +
+                                                        @"<publisher>Pan MacMillan</publisher>" +
+                                                        @"<publicationYear>2019</publicationYear>" +
+                                                        @"<pageCount>384</pageCount>" +
+                                                        @"<notes>Notes for book</notes>" +
+                                                        @"<isbn>978-1-50985-331-1</isbn>" +
+                                                    "</book>" +
+                                                "</books>" +
+                                            "</catalog>";
 
-            IEnumerable<ICatalogEntity> books = _catalog.Read(sr).ToList();
-            IEnumerable<ICatalogEntity> book_act = new[]
-            {
-                CreateBook()
-            };
+            var books = Library.libraryBooks;
+            _catalog.Read(sr);
+            var book_act = new List<ICatalogEntity>() { CreateBook(), CreateBook() };
 
             CollectionAssert.AreEqual(books, book_act, new BooksComparer());
-
-            sr.Dispose();
         }
 
         [Test]
         public void TestNewspaperRead()
         {
-            _catalog = new Lybrary();
-            TextReader sr = new StringReader(@"<?xml version=""1.0"" encoding=""utf-16""?>" +
+            var sr =                       @"<?xml version=""1.0"" encoding=""utf-16""?>" +
                                             "<catalog>" +
-                                                "<newspaper>" +
-                                                    @"<name>The Times</name>" +
-                                                    @"<publicationPlace>London</publicationPlace>" +
-                                                    @"<publisher>News Corporation</publisher>" +
-                                                    @"<publicationYear>2019</publicationYear>" +
-                                                    @"<pageCount>28</pageCount>" +
-                                                    @"<notes>Notes for newspaper</notes>" +
-                                                    @"<number>49</number>" +
-                                                    @"<date>" +
-                                                        @"<day>15</day>" +
-                                                        @"<month>12</month>" +
-                                                        @"<year>2019</year>" +
-                                                    @"</date>" +
-                                                    @"<ISSN>0140-0460</ISSN>" +
-                                                "</newspaper>" +
-                                            "</catalog>");
+                                                "<newspapers>" +
+                                                    "<newspaper>" +
+                                                        @"<name>The Times</name>" +
+                                                        @"<publicationPlace>London</publicationPlace>" +
+                                                        @"<publisher>News Corporation</publisher>" +
+                                                        @"<publicationYear>2019</publicationYear>" +
+                                                        @"<pageCount>28</pageCount>" +
+                                                        @"<notes>Notes for newspaper</notes>" +
+                                                        @"<number>49</number>" +
+                                                        @"<date>" +
+                                                            @"<day>15</day>" +
+                                                            @"<month>12</month>" +
+                                                            @"<year>2019</year>" +
+                                                        @"</date>" +
+                                                        @"<issn>0140-0460</issn>" +
+                                                    "</newspaper>" +
+                                                "</newspapers>" +
+                                            "</catalog>";
 
-            IEnumerable<ICatalogEntity> newspaper = _catalog.Read(sr).ToList();
-            IEnumerable<ICatalogEntity> newspaper_act = new[]
+            var newspaper = Library.libraryNewspapers;
+            _catalog.Read(sr);
+            var newspaper_act = new[]
             {
                 CreateNewspaper()
             };
 
             CollectionAssert.AreEqual(newspaper, newspaper_act, new NewspaperComparer());
-
-            sr.Dispose();
         }
 
         [Test]
         public void TestPatentsRead()
         {
-            _catalog = new Lybrary();
-            TextReader sr = new StringReader(@"<?xml version=""1.0"" encoding=""utf-16""?>" +
+            var sr =                       @"<?xml version=""1.0"" encoding=""utf-16""?>" +
                                             "<catalog>" +
-                                                "<patent>" +
-                                                    @"<name>MIDDLE BREAKER FOR A TILLAGE IMPLEMENT</name>" +
-                                                    @"<inventors>" +
-                                                        @"<inventor>Shawn J. BECKER</inventor>" +
-                                                        @"<inventor>David L. STEINLAGE</inventor>" +
-                                                    @"</inventors>" +
-                                                    @"<city>London</city>" +
-                                                    @"<registrationNumber>16009291</registrationNumber>" +
-                                                    @"<applicationDate>2018-06-15</applicationDate>" +
-                                                        @"<day>15</day>" +
-                                                        @"<month>06</month>" +
-                                                        @"<year>2018</year>" +
-                                                    @"</applicationDate>" +
-                                                    @"<publicationDate>" +
-                                                        @"<day>19</day>" +
-                                                        @"<month>12</month>" +
-                                                        @"<year>2019</year>" +
-                                                    @"</publicationDate>" +
-                                                    @"<pageCount>12</pageCount>" +
-                                                    @"<notes>A tillage implement having a frame member extending in a fore-aft direction of the implement, the frame member pivotally connected in a foldable configuration, the frame member comprising a main frame section.</notes>" +
-                                                    @"<ISBN>9781509853311</ISBN>" +
-                                                "</patent>" +
-                                            "</catalog>");
+                                                "<patents>" +
+                                                    "<patent>" +
+                                                        @"<name>MIDDLE BREAKER FOR A TILLAGE IMPLEMENT</name>" +
+                                                        @"<inventors>" +
+                                                            @"<inventor>Shawn J. BECKER</inventor>" +
+                                                            @"<inventor>David L. STEINLAGE</inventor>" +
+                                                        @"</inventors>" +
+                                                        @"<city>London</city>" +
+                                                        @"<registrationNumber>16009291</registrationNumber>" +
+                                                        @"<applicationDate>" +
+                                                            @"<day>15</day>" +
+                                                            @"<month>6</month>" +
+                                                            @"<year>2018</year>" +
+                                                        @"</applicationDate>" +
+                                                        @"<publicationDate>" +
+                                                            @"<day>19</day>" +
+                                                            @"<month>12</month>" +
+                                                            @"<year>2019</year>" +
+                                                        @"</publicationDate>" +
+                                                        @"<pageCount>12</pageCount>" +
+                                                        @"<notes>A tillage implement having a frame member extending in a fore-aft direction of the implement, the frame member pivotally connected in a foldable configuration, the frame member comprising a main frame section.</notes>" +
+                                                    "</patent>" +
+                                                    "<patent>" +
+                                                        @"<name>MIDDLE BREAKER FOR A TILLAGE IMPLEMENT</name>" +
+                                                        @"<inventors>" +
+                                                            @"<inventor>Shawn J. BECKER</inventor>" +
+                                                            @"<inventor>David L. STEINLAGE</inventor>" +
+                                                        @"</inventors>" +
+                                                        @"<city>London</city>" +
+                                                        @"<registrationNumber>16009291</registrationNumber>" +
+                                                        @"<applicationDate>" +
+                                                            @"<day>15</day>" +
+                                                            @"<month>6</month>" +
+                                                            @"<year>2018</year>" +
+                                                        @"</applicationDate>" +
+                                                        @"<publicationDate>" +
+                                                            @"<day>19</day>" +
+                                                            @"<month>12</month>" +
+                                                            @"<year>2019</year>" +
+                                                        @"</publicationDate>" +
+                                                        @"<pageCount>12</pageCount>" +
+                                                        @"<notes>A tillage implement having a frame member extending in a fore-aft direction of the implement, the frame member pivotally connected in a foldable configuration, the frame member comprising a main frame section.</notes>" +
+                                                    "</patent>" +
+                                                "</patents>" +
+                                            "</catalog>";
 
-            IEnumerable<ICatalogEntity> patent = _catalog.Read(sr).ToList();
+            var patent = Library.libraryPatents;
+            _catalog.Read(sr);
             IEnumerable<ICatalogEntity> patent_act = new[]
             {
+                CreatePatent(),
                 CreatePatent()
             };
 
             CollectionAssert.AreEqual(patent, patent_act, new PatentsComparer());
+        }
 
-            sr.Dispose();
+        [Test]
+        public void TestReadWrite()
+        {
+            var sr = @"<?xml version=""1.0"" encoding=""utf-16""?>" +
+                                            "<catalog>" +
+                                                "<books>" +
+                                                    "<book>" +
+                                                        @"<name>Me: Elton John Official Autobiography</name>" +
+                                                        @"<authors>" +
+                                                        @"<author>Elton John</author>" +
+                                                        @"</authors>" +
+                                                        @"<publicationPlace>London</publicationPlace>" +
+                                                        @"<publisher>Pan MacMillan</publisher>" +
+                                                        @"<publicationYear>2019</publicationYear>" +
+                                                        @"<pageCount>384</pageCount>" +
+                                                        @"<notes>Notes for book</notes>" +
+                                                        @"<isbn>978-1-50985-331-1</isbn>" +
+                                                    "</book>" +
+                                                     "<book>" +
+                                                        @"<name>Me: Elton John Official Autobiography</name>" +
+                                                        @"<authors>" +
+                                                        @"<author>Elton John</author>" +
+                                                        @"</authors>" +
+                                                        @"<publicationPlace>London</publicationPlace>" +
+                                                        @"<publisher>Pan MacMillan</publisher>" +
+                                                        @"<publicationYear>2019</publicationYear>" +
+                                                        @"<pageCount>384</pageCount>" +
+                                                        @"<notes>Notes for book</notes>" +
+                                                        @"<isbn>978-1-50985-331-1</isbn>" +
+                                                    "</book>" +
+                                                "</books>" +
+                                                "<patents>" +
+                                                    "<patent>" +
+                                                        @"<name>MIDDLE BREAKER FOR A TILLAGE IMPLEMENT</name>" +
+                                                        @"<inventors>" +
+                                                            @"<inventor>Shawn J. BECKER</inventor>" +
+                                                            @"<inventor>David L. STEINLAGE</inventor>" +
+                                                        @"</inventors>" +
+                                                        @"<city>London</city>" +
+                                                        @"<registrationNumber>16009291</registrationNumber>" +
+                                                        @"<applicationDate>" +
+                                                            @"<day>15</day>" +
+                                                            @"<month>6</month>" +
+                                                            @"<year>2018</year>" +
+                                                        @"</applicationDate>" +
+                                                        @"<publicationDate>" +
+                                                            @"<day>19</day>" +
+                                                            @"<month>12</month>" +
+                                                            @"<year>2019</year>" +
+                                                        @"</publicationDate>" +
+                                                        @"<pageCount>12</pageCount>" +
+                                                        @"<notes>A tillage implement having a frame member extending in a fore-aft direction of the implement, the frame member pivotally connected in a foldable configuration, the frame member comprising a main frame section.</notes>" +
+                                                    "</patent>" +
+                                                "</patents>" +
+                                                "<newspapers>" +
+                                                    "<newspaper>" +
+                                                        @"<name>The Times</name>" +
+                                                        @"<publicationPlace>London</publicationPlace>" +
+                                                        @"<publisher>News Corporation</publisher>" +
+                                                        @"<pageCount>28</pageCount>" +
+                                                        @"<publicationYear>2019</publicationYear>" +                                                        
+                                                        @"<notes>Notes for newspaper</notes>" +
+                                                        @"<number>49</number>" +
+                                                        @"<date>" +
+                                                            @"<day>15</day>" +
+                                                            @"<month>12</month>" +
+                                                            @"<year>2019</year>" +
+                                                        @"</date>" +
+                                                        @"<issn>0140-0460</issn>" +
+                                                    "</newspaper>" +
+                                                "</newspapers>" +
+                                            "</catalog>";
+            _catalog.Read(sr);
+
+            var entities = new IEnumerable<ICatalogEntity>[]
+            {
+                Library.libraryBooks,
+                Library.libraryPatents,
+                Library.libraryNewspapers                
+            };
+
+            var actualResult = _catalog.WriteTo(entities);
+
+            Assert.AreEqual(sr, actualResult.ToString());
+
         }
 
         [Test]
         public void TestAllWrite()
         {
-            _catalog = new Lybrary();
-            var book = CreateBook();
-            var newspaper = CreateNewspaper();
-            var patent = CreatePatent();
+            var book = new List<Book>()
+            {
+                CreateBook(),
+                CreateBook()
+            };
+            var newspaper = new List<Newspaper>()
+            {
+                CreateNewspaper()
+            };
+            var patent = new List <Patent>()
+            {
+                CreatePatent()
+            };
 
-            var entities = new ICatalogEntity[]
+            var entities = new IEnumerable<ICatalogEntity>[]
             {
                 book,
                 newspaper,
                 patent
             };
-
-            var actualResult = new StringWriter();
-
-            _catalog.WriteTo(actualResult, entities);
+            
+            var actualResult = _catalog.WriteTo(entities);
 
             var expectedResult = @"<?xml version=""1.0"" encoding=""utf-16""?>" +
                                             "<catalog>" +
+                                            "<books>"+
                                                 "<book>" +
                                                     @"<name>Me: Elton John Official Autobiography</name>" +
                                                     @"<authors>"+
@@ -150,46 +282,63 @@ namespace Tests
                                                     @"<publicationYear>2019</publicationYear>" +
                                                     @"<pageCount>384</pageCount>" +
                                                     @"<notes>Notes for book</notes>" +
-                                                    @"<ISBN>978-1-50985-331-1</ISBN>" +
+                                                    @"<isbn>978-1-50985-331-1</isbn>" +
                                                 "</book>" +
-                                             "<newspaper>" +
-                                                    @"<name>The Times</name>" +
+                                                "<book>" +
+                                                    @"<name>Me: Elton John Official Autobiography</name>" +
+                                                    @"<authors>" +
+                                                    @"<author>Elton John</author>" +
+                                                    @"</authors>" +
                                                     @"<publicationPlace>London</publicationPlace>" +
-                                                    @"<publisher>News Corporation</publisher>" +
-                                                    @"<pageCount>28</pageCount>" +
-                                                    @"<publicationYear>2019</publicationYear>" +                                                    
-                                                    @"<notes>Notes for newspaper</notes>" +
-                                                    @"<number>49</number>" +
-                                                    @"<date>" +
-                                                        @"<day>15</day>" +
-                                                        @"<month>12</month>" +
-                                                        @"<year>2019</year>" +
-                                                    @"</date>" +
-                                                    @"<ISSN>0140-0460</ISSN>" +
-                                                "</newspaper>" +
-                                                "<patent>" +
-                                                    @"<name>MIDDLE BREAKER FOR A TILLAGE IMPLEMENT</name>" +
-                                                    @"<inventors>" +
-                                                    @"<inventor>Shawn J. BECKER</inventor>" +
-                                                    @"<inventor>David L. STEINLAGE</inventor>" +
-                                                    @"</inventors>" +
-                                                    @"<city>London</city>" +
-                                                    @"<registrationNumber>16009291</registrationNumber>" +
-                                                    @"<applicationDate>2018-06-15</applicationDate>" +
-                                                        @"<day>15</day>" +
-                                                        @"<month>06</month>" +
-                                                        @"<year>2018</year>" +
-                                                    @"</applicationDate>" +
-                                                    @"<publicationDate>" +
-                                                        @"<day>19</day>" +
-                                                        @"<month>12</month>" +
-                                                        @"<year>2019</year>" +
-                                                    @"</publicationDate>" +
-                                                    @"<pageCount>12</pageCount>" +
-                                                    @"<notes>A tillage implement having a frame member extending in a fore-aft direction of the implement, the frame member pivotally connected in a foldable configuration, the frame member comprising a main frame section.</notes>" +
-                                                  "</patent>" +
+                                                    @"<publisher>Pan MacMillan</publisher>" +
+                                                    @"<publicationYear>2019</publicationYear>" +
+                                                    @"<pageCount>384</pageCount>" +
+                                                    @"<notes>Notes for book</notes>" +
+                                                    @"<isbn>978-1-50985-331-1</isbn>" +
+                                                "</book>" +
+                                             "</books>" +
+                                             "<newspapers>" +
+                                                 "<newspaper>" +
+                                                        @"<name>The Times</name>" +
+                                                        @"<publicationPlace>London</publicationPlace>" +
+                                                        @"<publisher>News Corporation</publisher>" +
+                                                        @"<pageCount>28</pageCount>" +
+                                                        @"<publicationYear>2019</publicationYear>" +                                                    
+                                                        @"<notes>Notes for newspaper</notes>" +
+                                                        @"<number>49</number>" +
+                                                        @"<date>" +
+                                                            @"<day>15</day>" +
+                                                            @"<month>12</month>" +
+                                                            @"<year>2019</year>" +
+                                                        @"</date>" +
+                                                        @"<issn>0140-0460</issn>" +
+                                                    "</newspaper>"+
+                                                "</newspapers>" +
+                                                "<patents>" +
+                                                    "<patent>" +
+                                                        @"<name>MIDDLE BREAKER FOR A TILLAGE IMPLEMENT</name>" +
+                                                        @"<inventors>" +
+                                                        @"<inventor>Shawn J. BECKER</inventor>" +
+                                                        @"<inventor>David L. STEINLAGE</inventor>" +
+                                                        @"</inventors>" +
+                                                        @"<city>London</city>" +
+                                                        @"<registrationNumber>16009291</registrationNumber>" +
+                                                        @"<applicationDate>" +
+                                                            @"<day>15</day>" +
+                                                            @"<month>6</month>" +
+                                                            @"<year>2018</year>" +
+                                                        @"</applicationDate>" +
+                                                        @"<publicationDate>" +
+                                                            @"<day>19</day>" +
+                                                            @"<month>12</month>" +
+                                                            @"<year>2019</year>" +
+                                                        @"</publicationDate>" +
+                                                        @"<pageCount>12</pageCount>" +
+                                                        @"<notes>A tillage implement having a frame member extending in a fore-aft direction of the implement, the frame member pivotally connected in a foldable configuration, the frame member comprising a main frame section.</notes>" +
+                                                    "</patent>" +
+                                                "</patents>" +
                                             "</catalog>";
-            var str = actualResult.ToString();
+
             Assert.AreEqual(expectedResult, actualResult.ToString());
         }
 
@@ -225,9 +374,7 @@ namespace Tests
                        x.PageCount == y.PageCount &&
                        x.Notes == y.Notes &&
                        x.Number == y.Number &&
-                       x.Date.Day == y.Date.Day &&
-                       x.Date.Month == y.Date.Month &&
-                       x.Date.Year == y.Date.Year &&
+                       x.Date == y.Date &&
                        x.ISSN == y.ISSN ? 0 : 1;
             }
             public int Compare(object x, object y)
@@ -285,12 +432,7 @@ namespace Tests
                 PageCount = 28,
                 Notes = "Notes for newspaper",
                 Number = 49,
-                Date = new Date
-                {
-                    Day = 15,
-                    Month = 12,
-                    Year = 2019
-                },
+                Date = new DateTime (2019, 12, 15),
                 ISSN = "0140-0460"
             };
             return newspaper;
@@ -306,10 +448,10 @@ namespace Tests
                     "Shawn J. BECKER",
                     "David L. STEINLAGE"
                 },
-                City  = "London",
-                RegistrationNumber   = 16009291,
-                ApplicationDate  = DateTime.Parse("15/06/2018"),
-                PublicationDate = DateTime.Parse("19/12/2019"),
+                City = "London",
+                RegistrationNumber = 16009291,
+                ApplicationDate = new DateTime(2018, 6, 15),
+                PublicationDate = new DateTime(2019, 12, 19),
                 PageCount  = 12,
                 Notes = "A tillage implement having a frame member extending in a fore-aft direction of the implement, the frame member pivotally connected in a foldable configuration, the frame member comprising a main frame section.",
             };

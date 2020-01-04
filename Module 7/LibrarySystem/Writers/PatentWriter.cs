@@ -1,51 +1,31 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Xml;
+using System.Xml.Linq;
 
 namespace LibrarySystem
 {
     class PatentWriter
     {
-        public void WritePatents(Patent patent, XmlWriter writer)
+        public void WritePatents(IEnumerable<Patent> patents, XmlWriter writer)
         {
-            writer.WriteStartElement("patent");
-            if (!string.IsNullOrWhiteSpace(patent.Name))
-            {
-                writer.WriteElementString("name", patent.Name);
-            }
-            if (patent.Inventors.Count != 0)
-            {
-                writer.WriteStartElement("inventors");
-                foreach (var inventor in patent.Inventors)
-                {
-                    writer.WriteElementString("inventor", inventor);
-                }
-                writer.WriteEndElement();
-            }
-            if (!string.IsNullOrWhiteSpace(patent.City))
-            {
-                writer.WriteElementString("city", patent.City);
-            }
-            if (patent.RegistrationNumber!=0)
-            {
-                writer.WriteElementString("registrationNumber", patent.RegistrationNumber.ToString());
-            }
-            if (patent.ApplicationDate != DateTime.MinValue)
-            {
-                writer.WriteElementString("applicationDate", patent.ApplicationDate.ToString("yyyy-MM-dd"));
-            }
-            if (patent.PublicationDate != DateTime.MinValue)
-            {
-                writer.WriteElementString("publicationDate", patent.PublicationDate.ToString("yyyy-MM-dd"));
-            }
-            if (patent.PageCount != 0)
-            {
-                writer.WriteElementString("pageCount", patent.PageCount.ToString());
-            }
-            if (!string.IsNullOrWhiteSpace(patent.Notes))
-            {
-                writer.WriteElementString("notes", patent.Notes);
-            }
-            writer.WriteEndElement();
+            var element = new XElement ("patents",
+               patents.Select(patent => new XElement("patent",
+            new XElement("name", patent.Name),
+            new XElement("inventors", patent.Inventors.Select(x => new XElement("inventor", x))),
+            new XElement("city", patent.City),
+            new XElement("registrationNumber", patent.RegistrationNumber),            
+            new XElement("applicationDate", new XElement("day", patent.ApplicationDate.Day),
+                                 new XElement("month", patent.ApplicationDate.Month),
+                                 new XElement("year", patent.ApplicationDate.Year)),
+            new XElement("publicationDate", new XElement("day", patent.PublicationDate.Day),
+                                 new XElement("month", patent.PublicationDate.Month),
+                                 new XElement("year", patent.PublicationDate.Year)),
+            new XElement("pageCount", patent.PageCount),
+            new XElement("notes", patent.Notes)
+            )));
+            element.WriteTo(writer);
         }
     }
 }

@@ -1,0 +1,8 @@
+﻿LogParser "SELECT Text as ERRORS INTO 'ReportFileName' from 'LogFile' WHERE text like '%ERROR%'" -i:TEXTLINE
+
+LogParser "SELECT Count(Text) as INFO INTO 'ReportFileName' from 'LogFile' WHERE text like '%INFO%'" -i:TEXTLINE
+LogParser "SELECT Count(Text) as DEBUG INTO 'ReportFileName' from 'LogFile' WHERE text like '%DEBUG%'" -i:TEXTLINE
+LogParser "SELECT Count(Text) as ERROR INTO 'ReportFileName' from 'LogFile' WHERE text like '%ERROR%'" -i:TEXTLINE
+LogParser "SELECT Count(Text) as TRACE INTO 'ReportFileName' from 'LogFile' WHERE text like '%TRACE%'" -i:TEXTLINE
+LogParser "SELECT Count(Text) as FATAL INTO 'ReportFileName' from 'LogFile' WHERE text like '%FATAL%'" -i:TEXTLINE
+LogParser "SELECT Count(Text) as WARN INTO 'ReportFileName' from 'LogFile' WHERE text like '%WARN%'" -i:TEXTLINE

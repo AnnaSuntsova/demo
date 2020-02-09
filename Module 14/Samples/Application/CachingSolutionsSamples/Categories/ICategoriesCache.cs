@@ -10,6 +10,6 @@ namespace CachingSolutionsSamples
 	public interface ICategoriesCache
 	{
 		IEnumerable<Category> Get(string forUser);
-		void Set(string forUser, IEnumerable<Category> categories);
-	}
+		void Set(string forUser, IEnumerable<Category> categories, DateTimeOffset expirationDate);
+    }
 }

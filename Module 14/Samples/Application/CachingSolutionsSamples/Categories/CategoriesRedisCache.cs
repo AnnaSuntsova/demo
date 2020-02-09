@@ -14,19 +14,25 @@ namespace CachingSolutionsSamples
 {
 	class CategoriesRedisCache : ICategoriesCache
 	{
-		private ConnectionMultiplexer redisConnection;
+		private ConnectionMultiplexer _redisConnection;
 		string prefix = "Cache_Categories";
 		DataContractSerializer serializer = new DataContractSerializer(
 			typeof(IEnumerable<Category>));
 
 		public CategoriesRedisCache(string hostName)
 		{
-			redisConnection = ConnectionMultiplexer.Connect(hostName);
-		}
+            var options = new ConfigurationOptions
+            {
+                AbortOnConnectFail = false,
+                EndPoints = { hostName },
+                Ssl = false
+            };
+            _redisConnection = ConnectionMultiplexer.Connect(options);
+        }
 
 		public IEnumerable<Category> Get(string forUser)
 		{
-			var db = redisConnection.GetDatabase();
+			var db = _redisConnection.GetDatabase();
 			byte[] s = db.StringGet(prefix + forUser);
 			if (s == null)
 				return null;
@@ -36,9 +42,9 @@ namespace CachingSolutionsSamples
 
 		}
 
-		public void Set(string forUser, IEnumerable<Category> categories)
+		public void Set(string forUser, IEnumerable<Category> categories, DateTimeOffset expirationDate)
 		{
-			var db = redisConnection.GetDatabase();
+			var db = _redisConnection.GetDatabase();
 			var key = prefix + forUser;
 
 			if (categories == null)
@@ -49,7 +55,7 @@ namespace CachingSolutionsSamples
 			{
 				var stream = new MemoryStream();
 				serializer.WriteObject(stream, categories);
-				db.StringSet(key, stream.ToArray());
+				db.StringSet(key, stream.ToArray(), expirationDate- DateTimeOffset.Now);
 			}
 		}
 	}

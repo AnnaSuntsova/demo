@@ -23,13 +23,13 @@ namespace Fibonacci
                 EndPoints = { hostName },
                 Ssl = false
             };
-            _redisConnection = ConnectionMultiplexer.Connect($"{hostName}, abortConnect = false");
+            _redisConnection = ConnectionMultiplexer.Connect(options);
         }
-
+         
         public int Get(int key)
         {
             var db = _redisConnection.GetDatabase();
-            byte[] s = db.StringGet(key.ToString());
+            byte[] s = db.StringGet(prefix+key);
             if (s == null)
                 return default(int);
 

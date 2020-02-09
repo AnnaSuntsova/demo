@@ -8,7 +8,7 @@ using System.Runtime.Caching;
 
 namespace CachingSolutionsSamples
 {
-	internal class CategoriesMemoryCache : ICategoriesCache
+	public class CategoriesMemoryCache : ICategoriesCache
 	{
 		ObjectCache cache = MemoryCache.Default;
 		string prefix  = "Cache_Categories";
@@ -18,9 +18,15 @@ namespace CachingSolutionsSamples
 			return (IEnumerable<Category>) cache.Get(prefix + forUser);
 		}
 
-		public void Set(string forUser, IEnumerable<Category> categories)
+		public void Set(string forUser, IEnumerable<Category> categories, DateTimeOffset expirationDate)
 		{
-			cache.Set(prefix + forUser, categories, ObjectCache.InfiniteAbsoluteExpiration);
+			cache.Set(prefix + forUser, categories, expirationDate);
 		}
-	}
+
+        public void Set(string key, IEnumerable<Category> value, CacheItemPolicy policy)
+        {
+            cache.Set(prefix + key, value, policy);
+        }
+
+    }
 }

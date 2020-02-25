@@ -2,14 +2,9 @@
 using HttpHandlerForNorthwind.Db;
 using NUnit.Framework;
 using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
-using System.Text;
 using System.Threading;
-using System.Web;
 
 namespace HttpHandlerTests
 {
@@ -27,79 +22,78 @@ namespace HttpHandlerTests
         private UriBuilder _uriBuilder;
         private Converters _converter;
 
-        public HandlerTests ()
+        public HandlerTests()
         {
-            //_context = new Northwind();
-            //var parser = new Parser();
-            //var converter = new Converters();
-            //_handler = new ReportHandler(parser, converter);
-            ////var listenerThread = new Thread(_service.Listen);
-            ////listenerThread.Start();
-            //_client = new HttpClient();
-            //_uriBuilder = new UriBuilder("http://localhost:81");
-            //_uriBuilder.Query = "customerId=VINET";
-            //_converter = new Converters();
+            _context = new Northwind();
+            var parser = new Parser();
+            var converter = new Converters();
+            _handler = new ReportHandler(parser, converter);
+            var listenerThread = new Thread(_handler.Listen);
+            listenerThread.Start();
+            _client = new HttpClient();
+            _uriBuilder = new UriBuilder("http://localhost:55177/");
+            _uriBuilder.Query = "customerId=VINET";
+            _converter = new Converters();
         }
 
         [Test]
-        public void ExcelHandle()
+        public void CheckExcelAcceptType()
         {
-            //var parser = new Parser();
-            //var stringBuilder = new StringBuilder();
-            //using (var sw = new StringWriter())
-            //{
-            //    var response = new HttpResponse(sw);
+            _client.DefaultRequestHeaders.Remove("Accept");
+            _client.DefaultRequestHeaders.Add("Accept", ExcelAcceptType);
+            var response = _client.GetAsync(_uriBuilder.Uri).Result;
+            var contentType = response.Content.Headers.ContentType.MediaType;
 
+            Assert.AreEqual(true, response.IsSuccessStatusCode);
+            Assert.AreEqual(ExcelAcceptType, contentType);
+        }
 
-            //    var request = WebRequest.CreateHttp(_uriBuilder.Uri);
-            //    var context = new HttpContext(request., response);
-            //    new ReportHandler(parser, _converter).ProcessRequest(context);
-            //}
+        [Test]
+        public void CheckTextXmlAcceptType()
+        {
+            _client.DefaultRequestHeaders.Remove("Accept");
+            _client.DefaultRequestHeaders.Add("Accept", TextXmlAcceptType);
+            var response = _client.GetAsync(_uriBuilder.Uri).Result;
+            var contentType = response.Content.Headers.ContentType.MediaType;
 
-            // Create a request using a URL that can receive a post.   
-            //Uri myUri = new Uri("http://localhost:43740/");
-            //// Create a new request to the above mentioned URL.	
-            //WebRequest request = WebRequest.Create(myUri);
-            //WebRequest request = WebRequest.Create("http://localhost:43740/");
-            // Set the Method property of the request to POST.  
-            WebRequest request = WebRequest.Create("http://www.contoso.com/PostAccepter.aspx");
-            request.Method = "POST";
-
-            // Create POST data and convert it to a byte array.  
-            string postData = "This is a test that posts this string to a Web server.";
-            byte[] byteArray = Encoding.UTF8.GetBytes(postData);
-
-            // Set the ContentType property of the WebRequest.  
-            request.ContentType = "application/x-www-form-urlencoded";
-            // Set the ContentLength property of the WebRequest.  
-            request.ContentLength = byteArray.Length;
-
-            // Get the request stream.  
-            Stream dataStream = request.GetRequestStream();
-            // Write the data to the request stream.  
-            dataStream.Write(byteArray, 0, byteArray.Length);
-            // Close the Stream object.  
-            dataStream.Close();
-
-            // Get the response.  
-            WebResponse response = request.GetResponse();
-            // Display the status.  
-            Console.WriteLine(((HttpWebResponse)response).StatusDescription);
-
-            // Get the stream containing content returned by the server.  
-            // The using block ensures the stream is automatically closed.
-            using (dataStream = response.GetResponseStream())
+            using (var stream = response.Content.ReadAsStreamAsync().Result)
             {
-                // Open the stream using a StreamReader for easy access.  
-                StreamReader reader = new StreamReader(dataStream);
-                // Read the content.  
-                string responseFromServer = reader.ReadToEnd();
-                // Display the content.  
-                Console.WriteLine(responseFromServer);
+                var data = _converter.FromXmlFormat(stream);
+                Assert.True(data.Any());
             }
 
-            // Close the response.  
-            response.Close();
+            Assert.AreEqual(true, response.IsSuccessStatusCode);
+            Assert.AreEqual(TextXmlAcceptType, contentType);
+        }
+
+        [Test]
+        public void CheckApplicationXmlAcceptType()
+        {
+            _client.DefaultRequestHeaders.Remove("Accept");
+            _client.DefaultRequestHeaders.Add("Accept", ApplicationXmlAcceptType);
+            var response = _client.GetAsync(_uriBuilder.Uri).Result;
+            var contentType = response.Content.Headers.ContentType.MediaType;
+
+            using (var stream = response.Content.ReadAsStreamAsync().Result)
+            {
+                var data = _converter.FromXmlFormat(stream);
+                Assert.True(data.Any());
+            }
+
+            Assert.AreEqual(true, response.IsSuccessStatusCode);
+            Assert.AreEqual(ApplicationXmlAcceptType, contentType);
+        }
+
+        [Test]
+        public void CheckDefaultAcceptType()
+        {
+            _client.DefaultRequestHeaders.Remove("Accept");
+            _client.DefaultRequestHeaders.Add("Accept", DefaultAcceptType);
+            var response = _client.GetAsync(_uriBuilder.Uri).Result;
+            var contentType = response.Content.Headers.ContentType.MediaType;
+
+            Assert.AreEqual(true, response.IsSuccessStatusCode);
+            Assert.AreEqual(ExcelAcceptType, contentType);
         }
     }
 }

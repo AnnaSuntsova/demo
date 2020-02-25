@@ -7,8 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HttpHandlerForNorthwind", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HttpHandlerTests", "HttpHandlerTests\HttpHandlerTests.csproj", "{C8381DA6-52D7-440B-AE21-36682D0C8BF7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HttClientForHandler", "HttClientForHandler\HttClientForHandler.csproj", "{FE25D49A-77FA-4F88-BDAD-60FA78D3880D}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,10 +21,6 @@ Global
 		{C8381DA6-52D7-440B-AE21-36682D0C8BF7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C8381DA6-52D7-440B-AE21-36682D0C8BF7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C8381DA6-52D7-440B-AE21-36682D0C8BF7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{FE25D49A-77FA-4F88-BDAD-60FA78D3880D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FE25D49A-77FA-4F88-BDAD-60FA78D3880D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FE25D49A-77FA-4F88-BDAD-60FA78D3880D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FE25D49A-77FA-4F88-BDAD-60FA78D3880D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

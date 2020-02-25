@@ -29,38 +29,50 @@ namespace HttpHandlerForNorthwind
         }
 
         public void ProcessRequest(HttpContext context)
-        {            
-            var request = context.Request;
-            var response = context.Response;
-            string acceptType;
-            var orderParams = new OrderParameters();
-
-            if (request.HttpMethod == "POST" && request.InputStream != null)
-            {
-                orderParams = _parser.ParseBody(request.InputStream);
-            }
-            else
-            {
-                var dataFromQuery = HttpUtility.ParseQueryString(request.Url.Query);
-                orderParams = _parser.ParseQuery(dataFromQuery);
-            }
-
-            if ((request.AcceptTypes == null)||(!request.AcceptTypes.Any()))
-            {
-                acceptType = "unknown";
-            }
-            else
-            {
-                acceptType = request.AcceptTypes.FirstOrDefault();
-            }
-
-            var data = GetData(orderParams);
-
-            SendResponse(acceptType, data, response);
-
+        {
+            Listen();            
         }
 
-        private void SendResponse(string acceptType, List<OrderFields> data, HttpResponse response)
+        public void Listen()
+        {
+            var listener = new HttpListener();
+            listener.Prefixes.Add("http://+:55177/");
+            listener.IgnoreWriteExceptions = true;
+            listener.Start();
+            do
+            {
+                var context = listener.GetContext();
+
+                var request = context.Request;
+                var response = context.Response;
+                string acceptType;
+                var orderParams = new OrderParameters();
+
+                if (request.HttpMethod == "POST" && request.InputStream != null)
+                {
+                    orderParams = _parser.ParseBody(request.InputStream);
+                }
+                else
+                {
+                    var dataFromQuery = HttpUtility.ParseQueryString(request.Url.Query);
+                    orderParams = _parser.ParseQuery(dataFromQuery);
+                }
+
+                if ((request.AcceptTypes == null) || (!request.AcceptTypes.Any()))
+                {
+                    acceptType = "unknown";
+                }
+                else
+                {
+                    acceptType = request.AcceptTypes.FirstOrDefault();
+                }
+
+                var data = GetData(orderParams);
+                SendResponse(acceptType, data, response);
+            } while (true);            
+        }
+
+        private void SendResponse(string acceptType, List<OrderFields> data, HttpListenerResponse response)
         {
             var memoryStream = new MemoryStream();
             if (acceptType != null)
@@ -71,37 +83,33 @@ namespace HttpHandlerForNorthwind
                         {
                             _converter.ToExcel(data, memoryStream);
                             response.AppendHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-                            //response.AppendHeader("Content-Disposition", "attachment");
                             break;
                         }
                     case "text/xml":
                         {
                             _converter.ToXmlFormat(data, memoryStream);
                             response.AppendHeader("Content-Type", "text/xml");
-                            //response.AppendHeader("Content-Disposition", "attachment");
                             break;
                         }
                     case "application/xml":
                         {
                             _converter.ToXmlFormat(data, memoryStream);
                             response.AppendHeader("Content-Type", "application/xml");
-                            //response.AppendHeader("Content-Disposition", "attachment");
                             break;
                         }
                     default:
                         {
                             _converter.ToExcel(data, memoryStream);
                             response.AppendHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-                            //response.AppendHeader("Content-Disposition", "attachment");
                             break;
                         }
                 }
-                memoryStream.Close();
+                
                 response.StatusCode = (int)HttpStatusCode.OK;
 
                 memoryStream.Seek(0, SeekOrigin.Begin);
                 memoryStream.WriteTo(response.OutputStream);
-                //response.OutputStream.Flush();
+                memoryStream.Close();
                 response.OutputStream.Close();
             }
         }
@@ -152,11 +160,25 @@ namespace HttpHandlerForNorthwind
                 }
                 else
                 {
-
                     if (orderParams.Skip == null && orderParams.Take.HasValue)
                     {
                         var query = db.Orders.Include(o => o.Customer)
                         .Take(orderParams.Take.Value)
+                        .Where(o => o.OrderDate > dateFrom && o.OrderDate < dateTo)
+                        .OrderBy(o => o.OrderID)
+                        .Select(o => new OrderFields
+                        {
+                            Customer = o.Customer.CompanyName,
+                            OrderDate = o.OrderDate,
+                            Freight = o.Freight,
+                            ShipCountry = o.ShipCountry,
+                            ShipName = o.ShipName
+                        });
+                        orderInfo = query.ToList();
+                    }
+                    else
+                    {
+                        var query = db.Orders.Include(o => o.Customer)
                         .Where(o => o.OrderDate > dateFrom && o.OrderDate < dateTo)
                         .OrderBy(o => o.OrderID)
                         .Select(o => new OrderFields
